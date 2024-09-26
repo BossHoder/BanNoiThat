@@ -43,6 +43,7 @@
     </header>
     <!-- main -->
     <main>
+        <?php include "menu.php" ?>
         <div class="product">
             <p class="title">Sản phẩm của chúng tôi</p>
             <div class="main-content">

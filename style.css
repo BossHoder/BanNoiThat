@@ -311,3 +311,33 @@ main {
 .already-have-account a{
     text-decoration: underline;
 }
+
+.menu-loaihang {
+    position: fixed; /* Đặt menu ở vị trí cố định */
+    top: 100px; /* Khoảng cách từ đỉnh của trang */
+    left: 0; /* Đặt menu sát lề trái */
+    width: 250px; /* Đặt chiều rộng của menu */
+    height: 100vh; /* Chiều cao chiếm toàn bộ chiều cao màn hình */
+    background-color: #6699CC; /* Màu nền của menu */
+    padding: 20px;
+}
+
+.menu-loaihang a{
+    font-size: 4rem;
+}
+
+.nav-menu-list {
+    list-style-type: none; /* Xóa dấu chấm đầu dòng */
+    padding: 0;
+}
+
+.nav-menu-list li {
+    margin-bottom: 15px;
+}
+
+.nav-menu-list a {
+    color: white; /* Màu chữ trắng */
+    text-decoration: none; /* Xóa gạch chân */
+    font-size: 1.8rem; /* Kích cỡ chữ */
+}
+
