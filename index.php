@@ -72,7 +72,7 @@
                         <img src="img/leviosa.svg" alt="" class="thumb">
                         <div class="info">
                             <div class="head">
-                                <p class="product-title">Ghế đẩu</p>
+                                <p class="product-title">Ghế đẩu horae o4</p>
                             </div>
                             <p class="decs">Ghế đẩu</p>
                             <div class="price">750.000đ</div>
@@ -87,7 +87,7 @@
                         <img src="img/potty.svg" alt="" class="thumb">
                         <div class="info">
                             <div class="head">
-                                <p class="product-title">Sofa chân cao</p>
+                                <p class="product-title">Sofa chân cao pusibich</p>
                             </div>
                             <p class="decs">Sofa dành cho người lùn</p>
                             <div class="price">5.750.000đ</div>
@@ -102,7 +102,7 @@
                         <img src="img/respira.svg" alt="" class="thumb">
                         <div class="info">
                             <div class="head">
-                                <p class="product-title">Combo Sofa+Bàn</p>
+                                <p class="product-title">Combo Sofa+Bàn daking</p>
                             </div>
                             <p class="decs">Bộ bàn bàn ghế tiếp khách</p>
                             <div class="price">15.750.000đ</div>
@@ -117,7 +117,7 @@
                         <img src="img/grifo.svg" alt="" class="thumb">
                         <div class="info">
                             <div class="head">
-                                <p class="product-title">Đèn ngủ</p>
+                                <p class="product-title">Đèn ngủ huiz</p>
                             </div>
                             <p class="decs">Đèn ngủ sang choảnh</p>
                             <div class="price">450.000đ</div>
@@ -132,7 +132,7 @@
                         <img src="img/muggo.svg" alt="" class="thumb">
                         <div class="info">
                             <div class="head">
-                                <p class="product-title">Sofa</p>
+                                <p class="product-title">Sofa unicouch</p>
                             </div>
                             <p class="decs">sofa!!!!</p>
                             <div class="price">169.550.000đ</div>

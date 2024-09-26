@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -69,8 +70,13 @@
                         Đăng nhập với google
                     </button>
                 </div>
+                <div class="already-have-account">
+                    <span>Bạn đã có tài khoản?</span>
+                    <a href="signin.php">Đăng nhập tại đây</a>
+                </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>
