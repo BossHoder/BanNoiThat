@@ -23,7 +23,8 @@ html {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     height: 700px;
 }
-.signup-image{
+
+.signup-image {
     width: 1200px;
     max-width: 500px;
     height: 700px;
@@ -66,7 +67,7 @@ a {
     position: fixed;
 }
 
-.signup-field label{
+.signup-field label {
     font-size: 3rem;
     padding-bottom: 10px;
 }
@@ -80,15 +81,15 @@ a {
     width: 600px;
 }
 
-.checkbox input[type=checkbox]{
-    transform : scale(3); 
+.checkbox input[type=checkbox] {
+    transform: scale(3);
 }
 
-.input-bar label{
+.input-bar label {
     font-weight: bold;
 }
 
-label a{
+label a {
     color: #000;
     text-decoration: underline;
 }
@@ -114,7 +115,8 @@ label a{
 }
 
 main {
-    padding-top: 100px; /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
+    padding-top: 100px;
+    /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
 }
 
 
@@ -149,15 +151,19 @@ main {
     content: '';
     position: absolute;
     left: 0;
-    bottom: -5px; /* Điều chỉnh khoảng cách từ chữ đến đường viền */
+    bottom: -5px;
+    /* Điều chỉnh khoảng cách từ chữ đến đường viền */
     width: 0;
-    height: 2px; /* Độ dày của đường viền */
-    background-color: rgba(255, 0, 0, 0.5); /* Màu đỏ mờ mờ */
+    height: 2px;
+    /* Độ dày của đường viền */
+    background-color: rgba(255, 0, 0, 0.5);
+    /* Màu đỏ mờ mờ */
     transition: width 0.3s ease;
 }
 
 .nav a:hover::after {
-    width: 100%; /* Độ dài bằng chiều dài của chữ */
+    width: 100%;
+    /* Độ dài bằng chiều dài của chữ */
 }
 
 .btn {
@@ -214,18 +220,18 @@ main {
     padding-top: 50px;
 }
 
-.product-title{
+.product-title {
     color: #690a0a;
     font-size: 4rem;
     font-weight: bold;
 }
 
-.price{
+.price {
     color: #5d39a1;
     font-size: 4rem;
 }
 
-.decs{
+.decs {
     color: #0a0c5a;
     font-size: 4rem;
 }
@@ -234,24 +240,26 @@ main {
     margin-top: 50px;
     display: flex;
     flex-wrap: wrap;
-    gap: 20px; 
+    gap: 20px;
     justify-content: center;
     align-items: center;
 }
 
-.product-list img{
+.product-list img {
     width: 285px;
     height: 301px;
     flex-shrink: 0;
     margin-left: 20%;
 }
 
-.product-item{
+.product-item {
     background-color: #d0ffbed5;
     padding: 20px;
     border-radius: 28px;
-    width: 500px; /* Chiều rộng cố định */
-    height: 550px; /* Chiều cao cố định */
+    width: 500px;
+    /* Chiều rộng cố định */
+    height: 550px;
+    /* Chiều cao cố định */
 }
 
 .product-buttons:hover {
@@ -260,12 +268,17 @@ main {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
 }
+
 .product-item:hover .product-buttons {
-    opacity: 1; /* Hiện các nút khi hover vào sản phẩm */
+    opacity: 1;
+    /* Hiện các nút khi hover vào sản phẩm */
 }
-.add-to-cart, .buy-now {
+
+.add-to-cart,
+.buy-now {
     padding: 20px 30px;
-    background-color: #5d39a1; /* Màu nền của nút */
+    background-color: #5d39a1;
+    /* Màu nền của nút */
     color: white;
     border: none;
     cursor: pointer;
@@ -273,18 +286,28 @@ main {
     transition: background-color 0.3s ease-in-out;
     font-size: 3rem;
 }
-.add-to-cart:hover, .buy-now:hover {
-    background-color: darkgoldenrod; /* Thay đổi màu khi hover vào nút */
+
+.add-to-cart:hover,
+.buy-now:hover {
+    background-color: darkgoldenrod;
+    /* Thay đổi màu khi hover vào nút */
 }
 
-.btn-signup{
+.btn-signup {
     border-radius: 20px;
-border: 0px solid var(--Gray-6, #F2F2F2);
-background: #301B52;
-width: 87px;
-height: 26px;
+    border: 0px solid var(--Gray-6, #F2F2F2);
+    background: #301B52;
+    width: 87px;
+    height: 26px;
 }
 
-.login-by-google .btn-submit{
+.login-by-google .btn-submit {
     background-color: #9e9e9e;
+}
+
+.already-have-account {
+    font-size: 3rem;
+}
+.already-have-account a{
+    text-decoration: underline;
 }
