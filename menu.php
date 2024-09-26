@@ -2,7 +2,7 @@
 	<link rel="stylesheet" href="style.css">
 </head>
 <div class="menu-loaihang">
-    <div class="nav_menu" style="background-color:#6699CC">
+    <div class="nav_menu" style="background-color: aliceblue">
 	
       <div>
         <span> <a href='index.php'>Loại hàng</a></span>

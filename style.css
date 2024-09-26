@@ -318,8 +318,9 @@ main {
     left: 0; /* Đặt menu sát lề trái */
     width: 250px; /* Đặt chiều rộng của menu */
     height: 100vh; /* Chiều cao chiếm toàn bộ chiều cao màn hình */
-    background-color: #6699CC; /* Màu nền của menu */
+    background-color: aliceblue; /* Màu nền của menu */
     padding: 20px;
+    border-right: 4px solid red;
 }
 
 .menu-loaihang a{
@@ -336,8 +337,8 @@ main {
 }
 
 .nav-menu-list a {
-    color: white; /* Màu chữ trắng */
+    color: rebeccapurple; /* Màu chữ trắng */
     text-decoration: none; /* Xóa gạch chân */
-    font-size: 1.8rem; /* Kích cỡ chữ */
+    font-size: 3rem; /* Kích cỡ chữ */
 }
 
