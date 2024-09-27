@@ -224,6 +224,7 @@ main {
     color: #690a0a;
     font-size: 4rem;
     font-weight: bold;
+    margin: 10px 0;
 }
 
 .price {
@@ -234,6 +235,7 @@ main {
 .decs {
     color: #0a0c5a;
     font-size: 4rem;
+    margin-bottom: 10px;
 }
 
 .product .main-content {
@@ -246,20 +248,34 @@ main {
 }
 
 .product-list img {
-    width: 285px;
-    height: 301px;
-    flex-shrink: 0;
-    margin-left: 20%;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+.product-list {
+    display: flex;
+    flex-wrap: wrap; /* Allows the items to wrap into a new row */
+    justify-content: space-between; /* Spreads items evenly with space between them */
+    gap: 20px; /* Adds some space between products */
 }
 
 .product-item {
     background-color: #d0ffbed5;
     padding: 20px;
     border-radius: 28px;
-    width: 500px;
-    /* Chiều rộng cố định */
-    height: 550px;
-    /* Chiều cao cố định */
+    width: 30%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds some shadow for better visual separation */
+    margin-bottom: 20px;
+}
+
+.product-buttons button {
+    padding: 10px 15px;
+    background-color: #5bc0de;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 1.2rem;
 }
 
 .product-buttons:hover {
@@ -318,7 +334,7 @@ main {
     left: 0; /* Đặt menu sát lề trái */
     width: 250px; /* Đặt chiều rộng của menu */
     height: 100vh; /* Chiều cao chiếm toàn bộ chiều cao màn hình */
-    background-color: aliceblue; /* Màu nền của menu */
+    background-color: yellowgreen; /* Màu nền của menu */
     padding: 20px;
     border-right: 4px solid red;
 }
@@ -330,15 +346,42 @@ main {
 .nav-menu-list {
     list-style-type: none; /* Xóa dấu chấm đầu dòng */
     padding: 0;
+    background-color: yellowgreen;
 }
 
 .nav-menu-list li {
     margin-bottom: 15px;
 }
 
+
+
 .nav-menu-list a {
-    color: rebeccapurple; /* Màu chữ trắng */
+    color: rgb(214, 7, 7); /* Màu chữ trắng */
     text-decoration: none; /* Xóa gạch chân */
     font-size: 3rem; /* Kích cỡ chữ */
+    
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.username {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #000;
+}
+
+.user-icon {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+
+.btn:hover {
+    background-color: #c9302c;
 }
 

@@ -1,10 +1,10 @@
 <head>
-	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="asset/css/style.css">
 </head>
 <div class="menu-loaihang">
     <div class="nav_menu" style="background-color: aliceblue">
 	
-      <div>
+      <div style="background-color: yellowgreen;">
         <span> <a href='index.php'>Loại hàng</a></span>
       </div>
         <ul class="nav-menu-list">

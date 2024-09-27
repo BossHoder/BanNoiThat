@@ -13,7 +13,13 @@
             <div class="form">
                 <div class="inputTH">
                     <span>Nhập tên hàng</span>
-                    <input type="text" name="tenhang" id="">
+                    <input type="text" name="tenhang" id="" required>
+                </div>
+                    <span>Nhập mô tả hàng</span>
+                    <input type="text" name="mota" id="">
+                </div>
+                    <span>Nhập hình ảnh hàng</span>
+                    <input type="text" name="hinh" id="">
                 </div>
                 <div class="inputDVD">
                     <span>Nhập Đơn vị đo</span>
@@ -49,6 +55,8 @@ include 'conn.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Lấy dữ liệu từ form
     $tenhang = $_POST['tenhang'];
+    $mota = $_POST['mota'];
+    $hinh = $_POST['hinh'];
     $donvido = $_POST['donvido'];
     $dongia = $_POST['dongia'];
     $maloaihang = $_POST['maloaihang'];
@@ -56,8 +64,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hansudung = $_POST['hansudung'];
 
     // Chuẩn bị câu truy vấn SQL
-    $sql = "INSERT INTO hang (tenhang, donvido, dongia, maloaihang, soluongton, hansudung) 
-            VALUES ('$tenhang', '$donvido', '$dongia', '$maloaihang', '$soluongton', '$hansudung')";
+    $sql = "INSERT INTO hang (tenhang, mota, hinh, donvido, dongia, maloaihang, soluongton, hansudung) 
+            VALUES ('$tenhang', '$mota', '$hinh' '$donvido', '$dongia', '$maloaihang', '$soluongton', '$hansudung')";
 
     // Thực hiện truy vấn
     if ($conn->query($sql) === TRUE) {

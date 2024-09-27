@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <!-- Nhúng style -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="asset/css/style.css">
 </head>
 
 <body>
@@ -19,7 +19,7 @@
             <div class="body-header">
                 <!-- logo -->
                 <a href="index.php" class="logo-section">
-                    <img src="img/logo.jpg" alt="logo" class="logo">
+                    <img src="asset/img/Social media logo.svg" alt="logo" class="logo">
                     <span class="company-name">Nội Thất Theanhdola</span>
                 </a>
                 <!-- navbar -->
@@ -33,7 +33,7 @@
                 </nav>
                 <!-- btn action -->
                 <div class="action">
-                    <a href="#" class="btn btn-sign-up">ĐĂNG KÝ</a>
+                    <a href="signup.php" class="btn btn-sign-up">ĐĂNG KÝ</a>
                 </div>
             </div>
         </div>
@@ -45,25 +45,27 @@
             <div class="signup-image">
             </div>
             <div class="signup-field">
-                <div class="input-bar">
-                    <label for="username">Nhập tên đăng nhập</label>
-                    <br>
-                    <input type="text" name="username" id="username">
-                </div>
-                <div class="input-bar">
-                    <label for="password">Nhập mật khẩu</label>
-                    <br>
-                    <input type="password" name="password" id="password">
-                </div>
-                <div class="checkbox">
-                    <input type="checkbox" name="agreeTP" id="agreeTP">
-                    <label for="agreeTP">Chấp nhận <a href="#">điều khoản</a> cùng <a href="#">chính sách</a> của chúng tôi</label>
-                </div>
-                <div class="checkbox">
-                    <input type="checkbox" name="submitReciveNews" id="submitReciveNews">
-                    <label for="submitReciveNews">Nhận thông tin mới nhất từ chúng tôi</label>
-                </div>
-                <button type="submit" class="btn-submit">Đăng Ký</button>
+                <form action="signupprocess.php" method="post">
+                    <div class="input-bar">
+                        <label for="username">Nhập tên đăng nhập</label>
+                        <br>
+                        <input type="text" name="username" id="username">
+                    </div>
+                    <div class="input-bar">
+                        <label for="password">Nhập mật khẩu</label>
+                        <br>
+                        <input type="password" name="password" id="password">
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" name="agreeTP" id="agreeTP" required>
+                        <label for="agreeTP">Chấp nhận <a href="#">điều khoản</a> cùng <a href="#">chính sách</a> của chúng tôi</label>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" name="submitReciveNews" id="submitReciveNews">
+                        <label for="submitReciveNews">Nhận thông tin mới nhất từ chúng tôi</label>
+                    </div>
+                    <button type="submit" class="btn-submit">Đăng Ký</button>
+                </form>
                 <div class="login-by-google">
                     <button class="btn-submit">
                         <img src="img/Social media logo.svg" alt="" style="height: 40px; width: 40px">
