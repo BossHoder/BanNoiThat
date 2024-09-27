@@ -129,7 +129,7 @@ if (isset($_REQUEST['maloaihang'])) {
             echo "<td class='price'>$dongia VNĐ</td>";
             echo "<td class='category'>$nhom</td>";
             echo "<td class='description'>$mota</td>";
-            echo "<td><img src='img/$hinh' alt='$tenhang'></td>";
+            echo "<td><img src='$hinh' alt='$tenhang'></td>";
             echo "</tr>";
         }
 

@@ -31,7 +31,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ss", $username, $hashed_password);
 
         if ($stmt->execute()) {
-            echo "Đăng ký thành công!";
+            echo "Đăng ký thành công! Bạn sẽ được chuyển hướng sau 3 giây.";
+
+            // Thêm script JavaScript để chuyển hướng sau 3 giây
+            echo '<script>
+                    setTimeout(function() {
+                        window.location.href = "signin.php";
+                    }, 3000); // 3000ms = 3s
+                  </script>';
         } else {
             echo "Lỗi: " . $stmt->error;
         }

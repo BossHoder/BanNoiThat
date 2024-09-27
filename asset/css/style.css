@@ -117,6 +117,7 @@ label a {
 main {
     padding-top: 100px;
     /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
+    padding-left: 12%;
 }
 
 
@@ -249,10 +250,11 @@ main {
 
 .product-list img {
     width: 100%;
-    height: auto;
+    height: 500px;
     object-fit: cover;
 }
 .product-list {
+    flex-grow: 1;
     display: flex;
     flex-wrap: wrap; /* Allows the items to wrap into a new row */
     justify-content: space-between; /* Spreads items evenly with space between them */
@@ -268,22 +270,7 @@ main {
     margin-bottom: 20px;
 }
 
-.product-buttons button {
-    padding: 10px 15px;
-    background-color: #5bc0de;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 1.2rem;
-}
 
-.product-buttons:hover {
-    display: flex;
-    gap: 3px;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
 
 .product-item:hover .product-buttons {
     opacity: 1;
@@ -300,7 +287,8 @@ main {
     cursor: pointer;
     border-radius: 15px;
     transition: background-color 0.3s ease-in-out;
-    font-size: 3rem;
+    font-size: 2rem;
+    margin-top: 30px;
 }
 
 .add-to-cart:hover,
@@ -337,6 +325,7 @@ main {
     background-color: yellowgreen; /* Màu nền của menu */
     padding: 20px;
     border-right: 4px solid red;
+    z-index: 1000px;
 }
 
 .menu-loaihang a{
@@ -381,7 +370,4 @@ main {
 }
 
 
-.btn:hover {
-    background-color: #c9302c;
-}
 

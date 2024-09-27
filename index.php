@@ -83,13 +83,16 @@ $result = $conn->query($sql);
             <p class="title">Sản phẩm của chúng tôi</p>
             <div class="main-content">
                 <div class="product-list">
-                <?php
+                    <?php
                     // Check if there are any products and display them
                     if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
+                        while ($row = $result->fetch_assoc()) {
                             echo '<div class="product-item">';
                             echo '<div class="product-image">';
-                            echo '<img src="asset/img/placeholder.png" alt="' . $row["tenhang"] . '" class="thumb">'; // Placeholder for product image
+                            // Nếu cột hình trống, sử dụng ảnh mặc định
+                            $imagePath = !empty($row["hinh"]) ? $row["hinh"] : 'asset/img/placeholder.png';
+
+                            echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($row["tenhang"]) . '" class="thumb">';
                             echo '</div>';
                             echo '<div class="info">';
                             echo '<div class="head">';
@@ -108,8 +111,8 @@ $result = $conn->query($sql);
                         echo '<p>Không có sản phẩm nào trong danh mục.</p>';
                     }
                     ?>
+                </div>
             </div>
-        </div>
     </main>
 </body>
 
