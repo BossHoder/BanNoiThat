@@ -28,7 +28,6 @@ html {
     width: 1200px;
     max-width: 500px;
     height: 700px;
-    background-image: url(img/baloon.svg);
     background-repeat: no-repeat;
     border-radius: 12px 0 0 12px;
 }
@@ -115,7 +114,7 @@ label a {
 }
 
 main {
-    padding-top: 100px;
+    padding-top: 200px;
     /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
     padding-left: 12%;
 }
@@ -141,7 +140,7 @@ main {
 }
 
 .nav a:hover {
-    color: #000;
+    color: #BDC3C7;
     font-family: "Times New Roman", Times, serif;
     font-size: 4rem;
     padding-left: 4.5rem;
@@ -152,13 +151,12 @@ main {
     content: '';
     position: absolute;
     left: 0;
-    bottom: -5px;
+    bottom: -10px;
     /* Điều chỉnh khoảng cách từ chữ đến đường viền */
     width: 0;
-    height: 2px;
+    height: 5px;
     /* Độ dày của đường viền */
-    background-color: rgba(255, 0, 0, 0.5);
-    /* Màu đỏ mờ mờ */
+    background-color: #BDC3C7;
     transition: width 0.3s ease;
 }
 
@@ -195,9 +193,9 @@ main {
 
 
 .title {
-    color: var(--Color-Gray-1, #3a3a3a);
+    color: var(--Color-Gray-1, #582617);
     text-align: center;
-    font-size: 4.5rem;
+    font-size: 5.5rem;
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
@@ -222,19 +220,19 @@ main {
 }
 
 .product-title {
-    color: #690a0a;
+    color: #5D4037;
     font-size: 4rem;
     font-weight: bold;
     margin: 10px 0;
 }
 
 .price {
-    color: #5d39a1;
+    color: #2C3E50;
     font-size: 4rem;
 }
 
 .decs {
-    color: #0a0c5a;
+    color:#2C3E50;
     font-size: 4rem;
     margin-bottom: 10px;
 }
@@ -355,7 +353,7 @@ main {
 
 
 .nav-menu-list a {
-    color: rgb(214, 7, 7); /* Màu chữ trắng */
+    color: #1d2935; /* Màu chữ trắng */
     text-decoration: none; /* Xóa gạch chân */
     font-size: 3rem; /* Kích cỡ chữ */
     
@@ -370,13 +368,13 @@ main {
 .username {
     font-size: 2rem;
     font-weight: bold;
-    color: #000;
+    color: #ECF0F1;
 }
 
 .user-icon {
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 100px;
+    height: 100px;
 }
 
 

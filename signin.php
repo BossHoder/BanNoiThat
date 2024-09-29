@@ -14,12 +14,12 @@
 </head>
 
 <body>
-    <header class="header fixed">
+    <header class="header fixed" style="background-color: #2C3E50;">
         <div class="main-content">
             <div class="body-header">
                 <!-- logo -->
                 <a href="index.php" class="logo-section">
-                    <img src="img/logo.jpg" alt="logo" class="logo">
+                    <img src="asset/img/logo.jpg" class="logo">
                     <span class="company-name">Nội Thất Theanhdola</span>
                 </a>
                 <!-- navbar -->
@@ -42,7 +42,7 @@
     <!-- Form đăng nhập -->
     <div class="main">
         <div class="signup-form">
-            <div class="signup-image">
+            <div class="signup-image" style="background-image: url(asset/img/baloon.svg)">
             </div>
             <form action="login_process.php" method="post">
                 <div class="signup-field">
@@ -67,14 +67,14 @@
                     <button type="submit" class="btn-submit">Đăng Nhập</button>
 
             </form>
-                <div class="login-by-google">
-                    <button class="btn-submit">
-                        <img src="img/Social media logo.svg" alt="" style="height: 40px; width: 40px">
-                        Đăng nhập với google
-                    </button>
-                </div>
+            <div class="login-by-google">
+                <button class="btn-submit">
+                    <img src="asset/img/Social media logo.svg" alt="" style="height: 40px; width: 40px">
+                    Đăng nhập với google
+                </button>
             </div>
         </div>
+    </div>
     </div>
 </body>
 

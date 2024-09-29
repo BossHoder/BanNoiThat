@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Kiểm tra nếu username hoặc password rỗng
     if (empty($username) || empty($password)) {
-        echo "<script>alert('Vui lòng nhập đầy đủ thông tin!'); window.location.href='login.php';</script>";
+        echo "<script>alert('Vui lòng nhập đầy đủ thông tin!'); window.location.href='signin.php';</script>";
         exit();
     } else {
         // Truy vấn kiểm tra người dùng trong bảng account
@@ -47,10 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: index.php");
                 exit();
             } else {
-                echo "<script>alert('Sai mật khẩu!'); window.location.href='login.php';</script>";
+                echo "<script>alert('Sai mật khẩu!'); window.location.href='signin.php';</script>";
             }
         } else {
-            echo "<script>alert('Tài khoản không tồn tại!'); window.location.href='login.php';</script>";
+            echo "<script>alert('Tài khoản không tồn tại!'); window.location.href='signin.php';</script>";
         }
 
         // Đóng statement
