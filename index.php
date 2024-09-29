@@ -100,6 +100,7 @@ $result = $conn->query($sql);
                             echo '</div>';
                             echo '<p class="decs">' . htmlspecialchars($row["mota"]) . '</p>';
                             echo '<div class="price">Giá: ' . number_format($row["dongia"], 0, '.', '.') . ' VND</div>';
+                            echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.').' ' . htmlspecialchars($row["donvido"]) .'.</div>';
                             echo '<div class="product-buttons">';
                             echo '<button class="add-to-cart">Thêm vào giỏ</button>';
                             echo '<button class="buy-now">Mua ngay</button>';

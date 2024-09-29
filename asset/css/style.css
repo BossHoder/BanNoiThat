@@ -248,6 +248,11 @@ main {
     align-items: center;
 }
 
+.remain{
+    color: rgb(0, 17, 255);
+    font-size: 4rem;
+}
+
 .product-list img {
     width: 100%;
     height: 500px;
