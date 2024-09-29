@@ -131,7 +131,7 @@ main {
 }
 
 .nav a {
-    color: #000;
+    color: #ffffff;
     font-family: "Times New Roman", Times, serif;
     font-size: 4rem;
     padding-left: 4.5rem;
@@ -184,7 +184,7 @@ main {
 }
 
 .company-name {
-    color: #000;
+    color: #ffffff;
     font-family: Montserrat;
     font-size: 4rem;
     font-style: normal;
@@ -294,6 +294,11 @@ main {
     transition: background-color 0.3s ease-in-out;
     font-size: 2rem;
     margin-top: 30px;
+
+}
+
+.buy-now{
+    margin-left: 10px;
 }
 
 .add-to-cart:hover,
@@ -327,7 +332,7 @@ main {
     left: 0; /* Đặt menu sát lề trái */
     width: 250px; /* Đặt chiều rộng của menu */
     height: 100vh; /* Chiều cao chiếm toàn bộ chiều cao màn hình */
-    background-color: yellowgreen; /* Màu nền của menu */
+    background-color: #ECF0F1; /* Màu nền của menu */
     padding: 20px;
     border-right: 4px solid red;
     z-index: 1000px;
@@ -340,7 +345,7 @@ main {
 .nav-menu-list {
     list-style-type: none; /* Xóa dấu chấm đầu dòng */
     padding: 0;
-    background-color: yellowgreen;
+    background-color: #ECF0F1;
 }
 
 .nav-menu-list li {

@@ -4,7 +4,7 @@
 <div class="menu-loaihang">
     <div class="nav_menu" style="background-color: aliceblue">
 	
-      <div style="background-color: yellowgreen;">
+      <div style="background-color: #ECF0F1;">
         <span> <a href='index.php'>Loại hàng</a></span>
       </div>
         <ul class="nav-menu-list">

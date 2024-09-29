@@ -37,9 +37,9 @@ $result = $conn->query($sql);
     <link rel="stylesheet" href="asset/css/style.css">
 </head>
 
-<body style="height: 5000px; background-color: yellowgreen;">
+<body style="height: 5000px; background-color: #D5B895;">
     <!-- header -->
-    <header class="header fixed" style="background-color: yellowgreen;">
+    <header class="header fixed" style="background-color: #2C3E50;">
         <div class="main-content">
             <div class="body-header">
                 <!-- logo -->
