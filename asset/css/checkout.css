@@ -1,0 +1,122 @@
+.checkout-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.billing-details {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.billing-info {
+    flex: 0 1 45%;
+}
+
+.order-summary {
+    flex: 0 1 45%;
+    background-color: #ffffff;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.heading {
+    font-family: "Poppins-SemiBold", Helvetica, sans-serif;
+    font-size: 34px;
+    color: #000;
+}
+
+.input-group {
+    display: flex;
+    gap: 20px;
+}
+
+.input-item {
+    margin-bottom: 20px;
+}
+
+.input-item label{
+    font-size: 30px;
+}
+
+.input-field,
+.wide-field {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #9f9f9f;
+    font-family: "Poppins-Medium", Helvetica, sans-serif;
+    font-size: 30px;
+}
+
+.input-field-mgl-30px{
+    margin-left: 30px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin: 10px 0;
+    font-family: "Poppins-Medium", Helvetica, sans-serif;
+    font-size: 25px;
+}
+
+.privacy-policy {
+    font-family: "Poppins-Light", Helvetica, sans-serif;
+    font-size: 25px;
+    color: #000;
+}
+
+.payment-methods {
+    margin-top: 20px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.payment-option label{
+    font-size: 25px;
+}
+
+.payment-description {
+    margin-left: 20px;
+    font-family: "Poppins-Light", Helvetica, sans-serif;
+    font-size: 14px;
+    color: #9f9f9f;
+}
+
+.order-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-family: "Poppins-Regular", Helvetica, sans-serif;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.privacy-link {
+    color: #000;
+    text-decoration: underline;
+}
+
+input[type=radio]{
+    width: 20px;
+    height: 20px;
+}

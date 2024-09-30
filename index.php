@@ -22,27 +22,43 @@ if (!isset($_SESSION['cart'])) {
 
 // Xử lý thêm vào giỏ hàng
 if (isset($_POST['add_to_cart'])) {
-    $product_id = $_POST['product_id'];
-    // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
-    if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id] += 1;
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+        echo "<script>
+            alert('Bạn cần phải đăng nhập để thêm vào giỏ hàng. bạn sẽ được điều hướng tới trang đăng nhập ');
+            
+                window.location.href = 'signin.php';
+            
+        </script>";
     } else {
-        $_SESSION['cart'][$product_id] = 1;
+        $product_id = $_POST['product_id'];
+        // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id] += 1;
+        } else {
+            $_SESSION['cart'][$product_id] = 1;
+        }
     }
 }
 
 // Xử lý mua ngay
 if (isset($_POST['buy_now'])) {
-    $product_id = $_POST['product_id'];
-    // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
-    if (isset($_SESSION['cart'][$product_id])) {
-        $_SESSION['cart'][$product_id] += 1;
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+        header("Location: checkout.php");
+        exit();
     } else {
-        $_SESSION['cart'][$product_id] = 1;
+        $product_id = $_POST['product_id'];
+        // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id] += 1;
+        } else {
+            $_SESSION['cart'][$product_id] = 1;
+        }
+        // Chuyển hướng đến trang cart.php
+        header("Location: cart.php");
+        exit();
     }
-    // Chuyển hướng đến trang cart.php
-    header("Location: cart.php");
-    exit();
 }
 
 // Fetch all products from the 'hang' table
