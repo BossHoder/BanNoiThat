@@ -25,10 +25,8 @@ if (isset($_POST['add_to_cart'])) {
     // Kiểm tra xem người dùng đã đăng nhập chưa
     if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         echo "<script>
-            alert('Bạn cần phải đăng nhập để thêm vào giỏ hàng. bạn sẽ được điều hướng tới trang đăng nhập ');
-            
+            alert('Bạn cần phải đăng nhập để thêm vào giỏ hàng.');
                 window.location.href = 'signin.php';
-            
         </script>";
     } else {
         $product_id = $_POST['product_id'];
@@ -60,7 +58,6 @@ if (isset($_POST['buy_now'])) {
         exit();
     }
 }
-
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
 $result = $conn->query($sql);

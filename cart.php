@@ -14,6 +14,7 @@ $conn = new mysqli($servername, $db_username, $db_password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
 // Xử lý cập nhật số lượng
 if (isset($_POST['update_quantity'])) {
@@ -37,50 +38,6 @@ if (isset($_POST['remove_item'])) {
     header("Location: cart.php");
     exit();
 }
-// Xử lý mua hàng
-if (isset($_POST['buy_all'])) {
-    $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-    $errors = [];
-
-    foreach ($cart_items as $item_id => $quantity) {
-        // Truy vấn số lượng tồn kho hiện tại của sản phẩm
-        $query = "SELECT soluongton FROM hang WHERE mahang = '$item_id'";
-        $result = $conn->query($query);
-
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $current_stock = $row['soluongton'];
-
-            // Kiểm tra nếu số lượng trong kho đủ để bán
-            if ($current_stock >= $quantity) {
-                // Cập nhật số lượng tồn kho sau khi mua
-                $new_stock = $current_stock - $quantity;
-                $update_query = "UPDATE hang SET soluongton = '$new_stock' WHERE mahang = '$item_id'";
-                $conn->query($update_query);
-            } else {
-                $errors[] = "Sản phẩm với mã $item_id không đủ hàng trong kho.";
-            }
-        } else {
-            $errors[] = "Sản phẩm với mã $item_id không tồn tại.";
-        }
-    }
-
-    if (empty($errors)) {
-        // Xóa giỏ hàng sau khi mua thành công
-        unset($_SESSION['cart']);
-        echo "<script>alert('Mua hàng thành công!');</script>";
-    } else {
-        foreach ($errors as $error) {
-            echo "<p>$error</p>";
-        }
-    }
-
-    // Chuyển hướng lại chính trang này sau khi xử lý mua hàng
-    header("Location: cart.php");
-    exit();
-}
-$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
 $result = $conn->query($sql);
@@ -225,27 +182,12 @@ $result = $conn->query($sql);
             cursor: pointer;
             width: 50px;
             height: 50px;
-            font-size: 4rem;
         }
 
         .quantity-display {
             width: 50px;
             text-align: center;
             margin: 0 10px;
-            font-size: 4rem;
-        }
-
-        .buy-all-btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-            margin-top: 20px;
-            width: 250px;
-            height: 100px;
-            border-radius: 20px;
-            font-size: 4rem;
         }
     </style>
 
@@ -345,12 +287,6 @@ if (!empty($cart_items)) {
 
     echo "</table>";
     echo "<h1>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</h1>";
-
-    // Nút mua hàng
-    echo "<form method='POST'>";
-    echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>";
-    echo "</form>";
-
 } else {
     echo "<p>Giỏ hàng của bạn hiện đang trống.</p>";
 }
