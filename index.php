@@ -15,6 +15,36 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
+// Khởi tạo giỏ hàng nếu chưa tồn tại
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+
+// Xử lý thêm vào giỏ hàng
+if (isset($_POST['add_to_cart'])) {
+    $product_id = $_POST['product_id'];
+    // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
+    if (isset($_SESSION['cart'][$product_id])) {
+        $_SESSION['cart'][$product_id] += 1;
+    } else {
+        $_SESSION['cart'][$product_id] = 1;
+    }
+}
+
+// Xử lý mua ngay
+if (isset($_POST['buy_now'])) {
+    $product_id = $_POST['product_id'];
+    // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
+    if (isset($_SESSION['cart'][$product_id])) {
+        $_SESSION['cart'][$product_id] += 1;
+    } else {
+        $_SESSION['cart'][$product_id] = 1;
+    }
+    // Chuyển hướng đến trang cart.php
+    header("Location: cart.php");
+    exit();
+}
+
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
 $result = $conn->query($sql);
@@ -31,7 +61,7 @@ $result = $conn->query($sql);
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
         rel="stylesheet" />
     <!-- Nhúng style -->
     <link rel="stylesheet" href="asset/css/style.css">
@@ -52,7 +82,6 @@ $result = $conn->query($sql);
                     <ul>
                         <li><a href="index.php">Trang chủ</a></li>
                         <li><a href="#">Cửa hàng</a></li>
-                        <li><a href="#">Thông tin</a></li>
                         <li><a href="#">Liên hệ</a></li>
                     </ul>
                 </nav>
@@ -63,7 +92,8 @@ $result = $conn->query($sql);
                     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
                         // Hiển thị tên người dùng và icon
                         echo '<div class="user-info">';
-                        echo '<img src="asset/img/user-icon.png" alt="User Icon" class="user-icon" style="width: 40px; height: 40px; border-radius: 50%;">';
+                        echo '<a href="cart.php"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
+                        echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
                         echo '<span class="username">' . htmlspecialchars($_SESSION['username']) . '</span>';
                         echo '<a href="logout.php" class="btn">Đăng xuất</a>'; // Nút đăng xuất
                         echo '</div>';
@@ -100,10 +130,18 @@ $result = $conn->query($sql);
                             echo '</div>';
                             echo '<p class="decs">' . htmlspecialchars($row["mota"]) . '</p>';
                             echo '<div class="price">Giá: ' . number_format($row["dongia"], 0, '.', '.') . ' VND</div>';
-                            echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.').' ' . htmlspecialchars($row["donvido"]) .'.</div>';
+                            echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.') . ' ' . htmlspecialchars($row["donvido"]) . '.</div>';
                             echo '<div class="product-buttons">';
-                            echo '<button class="add-to-cart">Thêm vào giỏ</button>';
-                            echo '<button class="buy-now">Mua ngay</button>';
+                            // Form cho nút "Thêm vào giỏ"
+                            echo '<form method="POST" style="display: inline-block;">';
+                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+                            echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
+                            echo '</form>';
+                            // Form cho nút "Mua ngay"
+                            echo '<form method="POST" style="display: inline-block;">';
+                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+                            echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
+                            echo '</form>';
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
