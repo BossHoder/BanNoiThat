@@ -49,6 +49,8 @@ a {
 .header .body-header {
     display: flex;
     align-items: center;
+        justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .signup-field {
@@ -134,7 +136,7 @@ main {
     color: #ffffff;
     font-family: "Times New Roman", Times, serif;
     font-size: 4rem;
-    padding-left: 4.5rem;
+    padding-left: 20px;;
     position: relative;
     display: inline-block;
     transition: all 0.3s ease;

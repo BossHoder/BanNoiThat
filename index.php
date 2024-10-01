@@ -41,23 +41,31 @@ if (isset($_POST['add_to_cart'])) {
 
 // Xử lý mua ngay
 if (isset($_POST['buy_now'])) {
-    // Kiểm tra xem người dùng đã đăng nhập chưa
-    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-        header("Location: checkout.php");
-        exit();
-    } else {
-        $product_id = $_POST['product_id'];
-        // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
-        if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] += 1;
+    $product_id = isset($_POST['product_id']) ? $_POST['product_id'] : null;
+
+    if ($product_id) {
+        // Kiểm tra xem người dùng đã đăng nhập chưa
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            // Nếu chưa đăng nhập, chuyển hướng đến checkout.php kèm theo product_id
+            header("Location: checkout.php?product_id=" . $product_id); // This is now correctly executed
+            exit(); // Important: Stop further execution
         } else {
-            $_SESSION['cart'][$product_id] = 1;
+            // Nếu đã đăng nhập, thêm sản phẩm vào giỏ hàng
+            if (isset($_SESSION['cart'][$product_id])) {
+                $_SESSION['cart'][$product_id] += 1;
+            } else {
+                $_SESSION['cart'][$product_id] = 1;
+            }
+            // Chuyển hướng đến trang cart.php hoặc thực hiện hành động khác
+            header("Location: cart.php");
+            exit();
         }
-        // Chuyển hướng đến trang cart.php
-        header("Location: cart.php");
-        exit();
+    } else {
+        echo "Lỗi: Không có product_id!";
     }
 }
+
+
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
 $result = $conn->query($sql);
@@ -151,10 +159,10 @@ $result = $conn->query($sql);
                             echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
                             echo '</form>';
                             // Form cho nút "Mua ngay"
-                            echo '<form method="POST" style="display: inline-block;">';
+                            echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
                             echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
                             echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
-                            echo '</form>';
+                            echo '</form>';                   
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';
