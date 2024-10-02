@@ -1,6 +1,7 @@
 <?php
 session_start();
-session_destroy(); // Xóa tất cả session
+unset($_SESSION['loggedin']);
+unset($_SESSION['username']);
 header("Location: signin.php"); // Điều hướng đến trang đăng nhập
 exit();
 ?>
