@@ -102,7 +102,6 @@ $result = $conn->query($sql);
                 <nav class="nav">
                     <ul>
                         <li><a href="index.php">Trang chủ</a></li>
-                        <li><a href="#">Cửa hàng</a></li>
                         <li><a href="#">Liên hệ</a></li>
                     </ul>
                 </nav>
@@ -120,7 +119,7 @@ $result = $conn->query($sql);
                         echo '</div>';
                     } else {
                         // Hiển thị nút Đăng ký nếu chưa đăng nhập
-                        echo '<a href="signup.php" class="btn btn-sign-up">ĐĂNG KÝ</a>';
+                        echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
                     }
                     ?>
                 </div>

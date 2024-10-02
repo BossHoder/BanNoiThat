@@ -26,14 +26,12 @@
                 <nav class="nav">
                     <ul>
                         <li><a href="index.php">Trang chủ</a></li>
-                        <li><a href="#">Cửa hàng</a></li>
-                        <li><a href="#">Thông tin</a></li>
                         <li><a href="#">Liên hệ</a></li>
                     </ul>
                 </nav>
                 <!-- btn action -->
                 <div class="action">
-                    <a href="signup.php" class="btn btn-sign-up">ĐĂNG KÝ</a>
+                    <a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>
                 </div>
             </div>
         </div>

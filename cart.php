@@ -38,6 +38,51 @@ if (isset($_POST['remove_item'])) {
     header("Location: cart.php");
     exit();
 }
+
+// Xử lý mua hàng
+if (isset($_POST['buy_all'])) {
+    $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+    $errors = [];
+
+    foreach ($cart_items as $item_id => $quantity) {
+        // Truy vấn số lượng tồn kho hiện tại của sản phẩm
+        $query = "SELECT soluongton FROM hang WHERE mahang = '$item_id'";
+        $result = $conn->query($query);
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $current_stock = $row['soluongton'];
+
+            // Kiểm tra nếu số lượng trong kho đủ để bán
+            if ($current_stock >= $quantity) {
+                // Cập nhật số lượng tồn kho sau khi mua
+                $new_stock = $current_stock - $quantity;
+                $update_query = "UPDATE hang SET soluongton = '$new_stock' WHERE mahang = '$item_id'";
+                $conn->query($update_query);
+            } else {
+                $errors[] = "Sản phẩm với mã $item_id không đủ hàng trong kho.";
+            }
+        } else {
+            $errors[] = "Sản phẩm với mã $item_id không tồn tại.";
+        }
+    }
+
+    if (empty($errors)) {
+        // Xóa giỏ hàng sau khi mua thành công
+        unset($_SESSION['cart']);
+        echo "<script>alert('Mua hàng thành công!');</script>";
+    } else {
+        foreach ($errors as $error) {
+            echo "<p>$error</p>";
+        }
+    }
+
+    // Chuyển hướng lại chính trang này sau khi xử lý mua hàng
+    header("Location: cart.php");
+    exit();
+}
+$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
 $result = $conn->query($sql);
@@ -75,7 +120,7 @@ $result = $conn->query($sql);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        h1 {
+        .total-price {
             font-size: 4rem;
         }
 
@@ -188,7 +233,24 @@ $result = $conn->query($sql);
             width: 50px;
             text-align: center;
             margin: 0 10px;
+            font-size: 4rem;
         }
+        .buy-all-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 3.5rem;
+}
+.checkout-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 10px 0;
+    border-top: 2px solid #ddd;
+}
     </style>
 
 </head>
@@ -207,7 +269,6 @@ $result = $conn->query($sql);
                 <nav class="nav">
                     <ul>
                         <li><a href="index.php">Trang chủ</a></li>
-                        <li><a href="#">Cửa hàng</a></li>
                         <li><a href="#">Liên hệ</a></li>
                     </ul>
                 </nav>
@@ -221,11 +282,8 @@ $result = $conn->query($sql);
                         echo '<a href="#"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
                         echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
                         echo '<span class="username">' . htmlspecialchars($_SESSION['username']) . '</span>';
-                        echo '<a href="logout.php" class="btn">Đăng xuất</a>'; // Nút đăng xuất
+                        echo '<a href="logout.php" class="btn ">Đăng xuất</a>'; // Nút đăng xuất
                         echo '</div>';
-                    } else {
-                        // Hiển thị nút Đăng ký nếu chưa đăng nhập
-                        echo '<a href="signup.php" class="btn btn-sign-up">ĐĂNG KÝ</a>';
                     }
                     ?>
                 </div>
@@ -286,7 +344,12 @@ if (!empty($cart_items)) {
     }
 
     echo "</table>";
-    echo "<h1>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</h1>";
+    echo "<div class='checkout-bar'>";
+    echo "<span class='total-price'>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</span>";
+    echo "<form method='POST'>";
+    echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>";
+    echo "</form>";
+    echo "</div>";
 } else {
     echo "<p>Giỏ hàng của bạn hiện đang trống.</p>";
 }

@@ -49,8 +49,6 @@ a {
 .header .body-header {
     display: flex;
     align-items: center;
-        justify-content: space-between;
-    flex-wrap: wrap;
 }
 
 .signup-field {
@@ -123,9 +121,6 @@ main {
 }
 
 
-.nav {
-    margin-left: auto;
-}
 
 .nav ul {
     display: flex;
@@ -136,7 +131,7 @@ main {
     color: #ffffff;
     font-family: "Times New Roman", Times, serif;
     font-size: 4rem;
-    padding-left: 20px;;
+    padding-left: 4.5rem;
     position: relative;
     display: inline-block;
     transition: all 0.3s ease;
@@ -168,6 +163,10 @@ main {
     /* Độ dài bằng chiều dài của chữ */
 }
 
+.btn-mgl{
+    margin-left: 500px;
+}
+
 .btn {
     background: rgb(190, 151, 51);
     display: inline-flex;
@@ -178,6 +177,7 @@ main {
     color: white;
     border-radius: 15px;
 }
+
 
 
 .header .action {
@@ -367,6 +367,7 @@ main {
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: 100px;
 }
 
 .username {
