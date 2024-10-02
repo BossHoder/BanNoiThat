@@ -41,47 +41,55 @@ if (isset($_POST['remove_item'])) {
 
 // Xử lý mua hàng
 if (isset($_POST['buy_all'])) {
-    $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-    $errors = [];
+    if (isset($_SESSION['makhach'])) {
+        // Proceed with purchase logic here, e.g., reduce stock, log purchase, etc.
+        $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+        $errors = [];
 
-    foreach ($cart_items as $item_id => $quantity) {
-        // Truy vấn số lượng tồn kho hiện tại của sản phẩm
-        $query = "SELECT soluongton FROM hang WHERE mahang = '$item_id'";
-        $result = $conn->query($query);
+        foreach ($cart_items as $item_id => $quantity) {
+            // Query the current stock of the product
+            $query = "SELECT soluongton FROM hang WHERE mahang = '$item_id'";
+            $result = $conn->query($query);
 
-        if ($result->num_rows > 0) {
-            $row = $result->fetch_assoc();
-            $current_stock = $row['soluongton'];
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $current_stock = $row['soluongton'];
 
-            // Kiểm tra nếu số lượng trong kho đủ để bán
-            if ($current_stock >= $quantity) {
-                // Cập nhật số lượng tồn kho sau khi mua
-                $new_stock = $current_stock - $quantity;
-                $update_query = "UPDATE hang SET soluongton = '$new_stock' WHERE mahang = '$item_id'";
-                $conn->query($update_query);
+                // Check if stock is sufficient
+                if ($current_stock >= $quantity) {
+                    // Update stock after purchase
+                    $new_stock = $current_stock - $quantity;
+                    $update_query = "UPDATE hang SET soluongton = '$new_stock' WHERE mahang = '$item_id'";
+                    $conn->query($update_query);
+                } else {
+                    $errors[] = "Sản phẩm với mã $item_id không đủ hàng trong kho.";
+                }
             } else {
-                $errors[] = "Sản phẩm với mã $item_id không đủ hàng trong kho.";
+                $errors[] = "Sản phẩm với mã $item_id không tồn tại.";
             }
+        }
+
+        if (empty($errors)) {
+            // Purchase is successful, clear the cart
+            unset($_SESSION['cart']);
+
+            // Show success dialog and redirect to index.php
+            echo "<script>
+                    alert('Bạn đã đặt hàng thành công');
+                    window.location.href = 'index.php';
+                  </script>";
         } else {
-            $errors[] = "Sản phẩm với mã $item_id không tồn tại.";
+            // Display any errors if the purchase failed
+            foreach ($errors as $error) {
+                echo "<p>$error</p>";
+            }
         }
-    }
-
-    if (empty($errors)) {
-        // Xóa giỏ hàng sau khi mua thành công
-        unset($_SESSION['cart']);
-        echo "<script>alert('Mua hàng thành công!');</script>";
     } else {
-        foreach ($errors as $error) {
-            echo "<p>$error</p>";
-        }
+        // Redirect to inputKhach.php if makhach is not set
+        header("Location: inputKhach.php");
+        exit;
     }
-
-    // Chuyển hướng lại chính trang này sau khi xử lý mua hàng
-    header("Location: cart.php");
-    exit();
-}
-$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+}$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM hang";
@@ -346,9 +354,33 @@ if (!empty($cart_items)) {
     echo "</table>";
     echo "<div class='checkout-bar'>";
     echo "<span class='total-price'>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</span>";
-    echo "<form method='POST'>";
-    echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>";
-    echo "</form>";
+    if (isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
+        
+        // Check if the user has a 'makhach'
+        $query = "SELECT makhach FROM account WHERE username = '$username'";
+        $result = $conn->query($query);
+    
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $makhach = $row['makhach'];
+    
+            // If 'makhach' is found, proceed with purchase
+            if (!empty($makhach)) {
+                $_SESSION['makhach'] = $makhach;  // Ensure 'makhach' is in session
+                echo "<form method='POST'>
+                        <button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>
+                      </form>";
+            } else {
+                // Redirect to inputKhach.php if no 'makhach'
+                echo "<form method='POST'>
+                        <button type='submit' name='buy_all' class='buy-all-btn' formaction='inputKhach.php'>Mua hàng</button>
+                      </form>";
+            }
+        }
+    } else {
+        echo "<p>Vui lòng đăng nhập trước khi mua hàng.</p>";
+    }
     echo "</div>";
 } else {
     echo "<p>Giỏ hàng của bạn hiện đang trống.</p>";

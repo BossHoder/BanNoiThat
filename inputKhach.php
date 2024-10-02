@@ -1,3 +1,48 @@
+<?php
+// inputKhach.php
+session_start(); // Start the session to access user data
+
+include 'conn.php';
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+    // Ensure all required fields are filled
+    if (!empty($_POST['tenkhach']) && !empty($_POST['dienthoai']) && !empty($_POST['diachi'])) {
+
+        // Lấy dữ liệu từ form
+        $tenkhach = $_POST['tenkhach'];
+        $dienthoai = $_POST['dienthoai'];
+        $diachi = $_POST['diachi'];
+
+        // Lấy username từ session
+        $username = $_SESSION['username'];
+
+        // Insert khách hàng information first
+        $insertKhachQuery = "INSERT INTO khach (tenkhach, dienthoai, diachi) VALUES ('$tenkhach', '$dienthoai', '$diachi')";
+        if ($conn->query($insertKhachQuery) === TRUE) {
+            $makhach = $conn->insert_id; // Get the last inserted ID (makhach)
+
+            // Update the account table with makhach
+            $updateAccountQuery = "UPDATE account SET makhach = '$makhach' WHERE username = '$username'";
+            if ($conn->query($updateAccountQuery) === TRUE) {
+                $_SESSION['makhach'] = $makhach; // Set makhach in session
+                header("Location: cart.php"); // Redirect back to cart.php
+                exit(); // Ensure script stops here
+            } else {
+                echo "Error updating account: " . $conn->error;
+            }
+        } else {
+            echo "Error inserting customer: " . $conn->error;
+        }
+
+    } else {
+        echo "Please fill all required fields.";
+    }
+
+    $conn->close();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,43 +62,18 @@
                 </div>
                 <div class="inputDVD">
                     <span>Nhập số điện thoại</span>
-                    <input type="text" name="dienthoai" id="">
+                    <input type="number" name="dienthoai" id="">
                 </div>
                 <div class="inputDG">
                     <span>Nhập địa chỉ</span>
-                    <input type="number" name="diachi" id="">
+                    <input type="text" name="diachi" id="">
                 </div>
                 <button type="submit">Nhập khách</button>
             </div>
         </div>
     </div>
     </form>
-    <?php
-// Chèn kết nối MySQL
-include 'conn.php';
 
-// Kiểm tra nếu form đã được submit
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Lấy dữ liệu từ form
-    $tenkhach = $_POST['tenkhach'];
-    $dienthoai = $_POST['dienthoai'];
-    $diachi = $_POST['diachi'];
-
-    // Chuẩn bị câu truy vấn SQL
-    $sql = "INSERT INTO hang (tenkhach, dienthoai, diachi) 
-            VALUES ('$tenkhach', '$dienthoai', '$diachi')";
-
-    // Thực hiện truy vấn
-    if ($conn->query($sql) === TRUE) {
-        echo "Nhập hàng thành công!";
-    } else {
-        echo "Lỗi: " . $sql . "<br>" . $conn->error;
-    }
-
-    // Đóng kết nối
-    $conn->close();
-}
-?>
 
 </body>
 </html>
