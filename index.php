@@ -137,6 +137,7 @@ $result = $conn->query($sql);
                     // Check if there are any products and display them
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
+                            $soluongton = $row["soluongton"];
                             echo '<div class="product-item">';
                             echo '<div class="product-image">';
                             // Nếu cột hình trống, sử dụng ảnh mặc định
@@ -150,9 +151,15 @@ $result = $conn->query($sql);
                             echo '</div>';
                             echo '<p class="decs">' . htmlspecialchars($row["mota"]) . '</p>';
                             echo '<div class="price">Giá: ' . number_format($row["dongia"], 0, '.', '.') . ' VND</div>';
-                            echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.') . ' ' . htmlspecialchars($row["donvido"]) . '.</div>';
+                            if ($soluongton > 0) {
+                                echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.') . ' ' . htmlspecialchars($row["donvido"]) . '.</div>';
+                            }
+                            else{
+                                echo '<div class="remain"><u style="color:red">Hết Hàng</u></div>';
+                            }
                             echo '<div class="product-buttons">';
-                            // Form cho nút "Thêm vào giỏ"
+                            if ($soluongton > 0) {
+                                // Form cho nút "Thêm vào giỏ"
                             echo '<form method="POST" style="display: inline-block;">';
                             echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
                             echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
@@ -161,7 +168,20 @@ $result = $conn->query($sql);
                             echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
                             echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
                             echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
-                            echo '</form>';                   
+                            echo '</form>';
+                            }     
+                            else {
+                                // Form cho nút "Thêm vào giỏ"
+                            echo '<form method="POST" style="display: inline-block;">';
+                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+                            echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
+                            echo '</form>';
+                            // Form cho nút "Mua ngay"
+                            echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
+                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+                            echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
+                            echo '</form>';
+                            }              
                             echo '</div>';
                             echo '</div>';
                             echo '</div>';

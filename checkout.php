@@ -215,11 +215,11 @@ if (isset($_POST['submit_info'])) {
         </p>
         <div class="payment-methods">
           <div class="payment-option">
-            <input type="radio" id="bank-transfer" name="payment" />
+            <input type="radio" id="bank-transfer" name="Banking" />
             <label for="bank-transfer">Chuyển khoản</label>
           </div>
           <div class="payment-option">
-            <input type="radio" id="cash-on-delivery" name="payment" />
+            <input type="radio" id="cash-on-delivery" name="COD" />
             <label for="cash-on-delivery">Trả khi nhận hàng</label>
           </div>
         </div>
