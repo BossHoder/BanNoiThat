@@ -14,8 +14,8 @@
 </head>
 
 <body>
-<header class="header fixed" style="background-color: #2C3E50;">
-<div class="main-content">
+    <header class="header fixed" style="background-color: #2C3E50;">
+        <div class="main-content">
             <div class="body-header">
                 <!-- logo -->
                 <a href="index.php" class="logo-section">
@@ -43,17 +43,29 @@
             <div class="signup-image" style="background-image: url(asset/img/baloon.svg);">
             </div>
             <div class="signup-field">
-                <form action="signupprocess.php" method="post">
+                <form action="signupprocess.php" method="post" name="form1">
+
                     <div class="input-bar">
-                        <label for="username">Nhập tên đăng nhập</label>
+                        <label for="cust_email">Nhập Tên</label>
                         <br>
-                        <input type="text" name="username" id="username">
+                        <input type="text" name="cust_name" id="cust_name">
                     </div>
                     <div class="input-bar">
-                        <label for="password">Nhập mật khẩu</label>
+                        <label for="cust_email">Nhập Email</label>
                         <br>
-                        <input type="password" name="password" id="password">
+                        <input type="email" name="cust_email" id="cust_email">
                     </div>
+                    <div class="input-bar">
+                        <label for="cust_password">Nhập mật khẩu</label>
+                        <br>
+                        <input type="password" name="cust_password" id="cust_password">
+                    </div>
+                    <div class="input-bar">
+                        <label for="cust_re_password">Nhập lại mật khẩu</label>
+                        <br>
+                        <input type="password" name="cust_re_password" id="cust_re_password">
+                    </div>
+
                     <div class="checkbox">
                         <input type="checkbox" name="agreeTP" id="agreeTP" required>
                         <label for="agreeTP">Chấp nhận <a href="#">điều khoản</a> cùng <a href="#">chính sách</a> của chúng tôi</label>

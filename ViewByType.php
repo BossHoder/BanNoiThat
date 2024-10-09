@@ -20,6 +20,8 @@ if (!isset($_SESSION['cart'])) {
     $_SESSION['cart'] = [];
 }
 
+
+
 // Xử lý thêm vào giỏ hàng
 if (isset($_POST['add_to_cart'])) {
     // Kiểm tra xem người dùng đã đăng nhập chưa
@@ -66,8 +68,8 @@ if (isset($_POST['buy_now'])) {
 }
 
 
-// Fetch all products from the 'hang' table
-$sql = "SELECT * FROM hang";
+// Fetch all products from the 'tbl_product' table
+$sql = "SELECT * FROM tbl_product";
 $result = $conn->query($sql);
 
 ?>
@@ -180,10 +182,10 @@ if (isset($_REQUEST['maloaihang'])) {
     }
 
     // Thực hiện truy vấn
-    $query = "SELECT hang.mahang, hang.maloaihang, hang.tenhang, hang.mota, loaihang.tenloaihang, hang.hinh, hang.dongia, hang.soluongton 
-              FROM hang 
-              JOIN loaihang ON hang.maloaihang = loaihang.maloaihang 
-              WHERE hang.maloaihang = '$malh'";
+    $query = "SELECT tbl_product.p_id, tbl_product.maloaihang, tbl_product.p_name, tbl_product.p_description, loaihang.tenloaihang, tbl_product.p_featured_photo, tbl_product.p_current_price, tbl_product.p_qty 
+              FROM tbl_product 
+              JOIN loaihang ON tbl_product.maloaihang = loaihang.maloaihang 
+              WHERE tbl_product.maloaihang = '$malh'";
     $result = mysqli_query($conn, $query);
 
     // Kiểm tra kết quả truy vấn
@@ -192,42 +194,42 @@ if (isset($_REQUEST['maloaihang'])) {
         echo "<tr><th>Tên hàng</th><th>Đơn giá</th><th>Loại hàng</th><th>Mô tả</th><th>Hình ảnh</th></tr>";
 
         while ($row = mysqli_fetch_assoc($result)) {
-            $tenhang = htmlspecialchars($row['tenhang']);
-            $dongia = number_format($row['dongia'], 0, '.', '.');
+            $p_name = htmlspecialchars($row['p_name']);
+            $p_current_price = number_format($row['p_current_price'], 0, '.', '.');
             $nhom = htmlspecialchars($row['tenloaihang']);
-            $mota = htmlspecialchars($row['mota']);
-            $hinh = htmlspecialchars($row['hinh']);
-            $soluongton = $row['soluongton'];
+            $p_description = htmlspecialchars($row['p_description']);
+            $p_featured_photo = htmlspecialchars($row['p_featured_photo']);
+            $p_qty = $row['p_qty'];
             
 
             echo "<tr>";
-            echo "<td class='product-title'>$tenhang</td>";
-            echo "<td class='price'>$dongia VNĐ</td>";
+            echo "<td class='product-title'>$p_name</td>";
+            echo "<td class='price'>$p_current_price VNĐ</td>";
             echo "<td class='category'>$nhom</td>";
-            echo "<td class='description'>$mota</td>";
-            echo "<td><img src='$hinh' alt='$tenhang'></td>";
+            echo "<td class='description'>$p_description</td>";
+            echo "<td><img src='$p_featured_photo' alt='$p_name'></td>";
             echo "<td>";
-            if ($soluongton > 0) {
+            if ($p_qty > 0) {
                 // Form cho nút "Thêm vào giỏ"
             echo '<form method="POST" style="display: inline-block;">';
-            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+            echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
             echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
             echo '</form>';
             // Form cho nút "Mua ngay"
             echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
-            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+            echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
             echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
             echo '</form>';
             }     
             else {
                 // Form cho nút "Thêm vào giỏ"
             echo '<form method="POST" style="display: inline-block;">';
-            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+            echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
             echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
             echo '</form>';
             // Form cho nút "Mua ngay"
             echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
-            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
+            echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
             echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
             echo '</form>';
             }                          echo "</td>";

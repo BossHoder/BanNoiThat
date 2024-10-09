@@ -1,33 +1,30 @@
 <?php
-session_start(); // Always start session at the beginning of the file
-
-// Kết nối đến MySQL database
-$servername = "localhost";
-$db_username = "root"; // Thay bằng thông tin đăng nhập của bạn
-$db_password = "azz123123"; // Thay bằng mật khẩu của bạn
-$dbname = "qlbh";
+session_start();
+$servername = "localhost";  // Tên máy chủ MySQL (thường là localhost)
+$username = "root";         // Tên người dùng MySQL
+$password = "azz123123";             // Mật khẩu của người dùng MySQL
+$dbname = "QLBH";   // Tên database bạn muốn kết nối
 
 // Tạo kết nối
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Kiểm tra kết nối
 if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
+    die("Kết nối thất bại: " . $conn->connect_error . "");
 }
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-
 // Xử lý cập nhật số lượng
 if (isset($_POST['update_quantity'])) {
     $product_id = $_POST['product_id'];
     $quantity = intval($_POST['quantity']);
 
     // Lấy số lượng tồn kho hiện tại của sản phẩm
-    $query = "SELECT soluongton FROM hang WHERE mahang = '$product_id'";
+    $query = "SELECT p_qty FROM tbl_product WHERE p_id = '$product_id'";
     $result = $conn->query($query);
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
-        $current_stock = intval($row['soluongton']);
+        $current_stock = intval($row['p_qty']);
 
         // Kiểm tra nếu số lượng vượt quá số lượng tồn hoặc nhỏ hơn 1
         if ($quantity <= $current_stock && $quantity >= 1) {
@@ -49,131 +46,123 @@ if (isset($_POST['update_quantity'])) {
 // Xử lý xóa sản phẩm khỏi giỏ hàng
 if (isset($_POST['remove_item'])) {
     $product_id = $_POST['product_id'];
-    unset($_SESSION['cart'][$product_id]);
-    header("Location: cart.php");
+
+    // Debug: kiểm tra xem product_id có đúng không và sản phẩm có trong giỏ hàng không
+    if (isset($_SESSION['cart'][$product_id])) {
+        // Get product name
+        $query = "SELECT p_name FROM tbl_product WHERE p_id = '$product_id'";
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $product_name = $row['p_name'];
+
+        // Remove product from cart
+        unset($_SESSION['cart'][$product_id]);
+
+        // Alert product name and redirect to cart.php
+        echo "<script>alert('Sản phẩm $product_name đã được xóa khỏi giỏ hàng.'); window.location.href = 'cart.php';</script>";
+    } else {
+        echo "<script>alert('Sản phẩm không tồn tại trong giỏ hàng.'); window.location.href = 'cart.php';</script>";
+    }
     exit();
 }
 
 // Xử lý mua hàng
 if (isset($_POST['buy_all'])) {
     $paymentMethod = isset($_POST['payment']) ? $_POST['payment'] : null; // Get selected payment method
+    if (!isset($_SESSION['cust_address'])) { // Using cust_id now
+        header("Location: inputKhach.php"); // You'll need to adapt inputKhach.php
+        exit;
+    }
+    $cust_id = $_SESSION['cust_id']; // Use cust_id
 
     if ($paymentMethod == 'bank-transfer') {
         // Thanh toán qua MoMo
         $total_price = 0; // Tính tổng tiền của giỏ hàng
         foreach ($cart_items as $item_id => $quantity) {
-            $query = "SELECT dongia FROM hang WHERE mahang = '$item_id'";
+            $query = "SELECT p_current_price FROM tbl_product WHERE p_id = '$item_id'";
             $result = $conn->query($query);
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    $dongia = $row['dongia'];
-                    $total_price += $dongia * $quantity;
+                    $p_current_price = $row['p_current_price'];
+                    $total_price += $p_current_price * $quantity;
                 }
             }
         }
 
         // Thực hiện yêu cầu thanh toán MoMo
-        require 'momo_payment.php'; // Gọi file xử lý MoMo
+        require 'payment/momo_payment.php'; // Gọi file xử lý MoMo
 
         // Kết thúc xử lý và không tiếp tục xử lý các phương thức thanh toán khác
         exit;
     } else {
-        if (isset($_SESSION['makhach'])) {
+        if (isset($_SESSION['cust_id'])) {
             // Proceed with purchase logic here, e.g., reduce stock, log purchase, etc.
             $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
             $errors = [];
 
-            $makhach = $_SESSION['makhach'];
+            $cust_id = $_SESSION['cust_id'];
             $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
             $errors = [];
             $tongtien = 0; // Initialize total price
 
             // Start transaction
             $conn->begin_transaction();
-
             try {
-                // Insert into 'donhang' table
-                $ngaythang = date("Y-m-d");
-                $insert_donhang_query = "INSERT INTO donhang (makhach, ngaythang, tongtien) VALUES ('$makhach', '$ngaythang', 0)"; // Tongtien will be updated later
-                if (!$conn->query($insert_donhang_query)) {
-                    throw new Exception("Lỗi khi thêm đơn hàng: " . $conn->error);
-                }
-                $madh = $conn->insert_id; // Get the last inserted madh
+                // tbl_order insert (no equivalent to donhang, directly insert into order table)
+                $payment_id = time(); // Or generate a unique payment ID
+                foreach ($_SESSION['cart'] as $p_id => $quantity) {
+                    $product_stmt = $conn->prepare("SELECT p_current_price, p_qty, p_name FROM tbl_product WHERE p_id = ?");
+                    $product_stmt->bind_param("i", $p_id);
+                    $product_stmt->execute();
+                    $product_result = $product_stmt->get_result();
+                    $product = $product_result->fetch_assoc();
 
-
-                foreach ($cart_items as $mahang => $soluong) {
-                    // Get product details (dongia)
-                    $product_query = "SELECT dongia, soluongton FROM hang WHERE mahang = '$mahang'";
-                    $product_result = $conn->query($product_query);
-
-                    if ($product_result->num_rows > 0) {
-                        $product_row = $product_result->fetch_assoc();
-                        $dongia = $product_row['dongia'];
-                        $current_stock = $product_row['soluongton'];
-
-                        // Check stock
-                        if ($current_stock < $soluong) {
-                            throw new Exception("Sản phẩm $mahang không đủ hàng.");
-                        }
-
-                        $thanhtien = $dongia * $soluong;
-                        $tongtien += $thanhtien;
-
-
-                        // Insert into 'chitiethd' table
-                        $insert_chitiethd_query = "INSERT INTO chitiethd (mahd, mahang, soluong, thanhtien) VALUES ('$madh', '$mahang', '$soluong', '$thanhtien')";
-                        if (!$conn->query($insert_chitiethd_query)) {
-                            throw new Exception("Lỗi khi thêm chi tiết hóa đơn: " . $conn->error);
-                        }
-
-                        // Insert into 'chitietdonhang' table (if needed - this seems redundant with chitiethd)
-                        $insert_chitietdonhang_query = "INSERT INTO chitietdonhang (madh, mahang, soluong, thanhtien) VALUES ('$madh', '$mahang', '$soluong', '$thanhtien')";
-                        if (!$conn->query($insert_chitietdonhang_query)) {
-                            throw new Exception("Lỗi khi thêm chi tiết đơn hàng: " . $conn->error);
-                        }
-
-                        // Update stock
-                        $new_stock = $current_stock - $soluong;
-                        $update_stock_query = "UPDATE hang SET soluongton = '$new_stock' WHERE mahang = '$mahang'";
-                        if (!$conn->query($update_stock_query)) {
-                            throw new Exception("Lỗi khi cập nhật số lượng tồn kho: " . $conn->error);
-                        }
-                    } else {
-                        throw new Exception("Sản phẩm $mahang không tồn tại.");
+                    if (!$product) {
+                        throw new Exception("Không tìm thấy sp.");
                     }
+
+                    if ($product['p_qty'] < $quantity) {
+                        throw new Exception("Hết Hàng " . $product['p_name']);
+                    }
+
+
+                    $unit_price = $product['p_current_price'];
+                    $product_name = $product['p_name'];
+                    // ... Get size and color if applicable (you'll need to adapt this based on your cart structure and database) ...
+                    $size = ""; // Replace with actual size logic if needed
+                    $color = ""; // Replace with actual color logic if needed
+
+
+
+                    $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id) VALUES (?,?,?,?,?,?,?)");
+                    $order_stmt->bind_param("isssiis", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id);
+                    $order_stmt->execute();
+
+
+                    // Update Product Quantity
+                    $new_qty = $product['p_qty'] - $quantity;
+                    $update_qty_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
+                    $update_qty_stmt->bind_param("ii", $new_qty, $p_id);
+                    $update_qty_stmt->execute();
                 }
 
-                // Update 'donhang' with the correct total price
-                $update_tongtien_query = "UPDATE donhang SET tongtien = '$tongtien' WHERE madh = '$madh'";
-                if (!$conn->query($update_tongtien_query)) {
-                    throw new Exception("Lỗi khi cập nhật tổng tiền đơn hàng: " . $conn->error);
-                }
 
+                // You don't need the donhang update as you are inserting directly into tbl_order
 
-
-                $conn->commit(); // Commit transaction
-                unset($_SESSION['cart']); // Clear cart
-
-
-                echo "<script>
-                        alert('Bạn đã đặt hàng thành công');
-                        window.location.href = 'index.php';
-                      </script>";
+                $conn->commit();
+                unset($_SESSION['cart']);
+                echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
             } catch (Exception $e) {
-                $conn->rollback(); // Rollback if any error occurred
-                echo "<p>Lỗi: " . $e->getMessage() . "</p>"; // Display error message
+                $conn->rollback();
+                echo "<p>Lỗi: " . $e->getMessage() . "</p>"; // Handle/display error
             }
-        } else {
-            // Redirect to inputKhach.php if makhach is not set
-            header("Location: inputKhach.php");
-            exit;
         }
     }
 }
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
 // Fetch all products from the 'hang' table
-$sql = "SELECT * FROM hang";
+$sql = "SELECT * FROM tbl_product";
 $result = $conn->query($sql);
 
 ?>
@@ -372,7 +361,7 @@ $result = $conn->query($sql);
                         echo '<div class="user-info">';
                         echo '<a href="#"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
                         echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<span class="username">' . htmlspecialchars($_SESSION['username']) . '</span>';
+                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
                         echo '<a href="logout.php" class="btn ">Đăng xuất</a>'; // Nút đăng xuất
                         echo '</div>';
                     }
@@ -390,21 +379,21 @@ $result = $conn->query($sql);
         $total_price = 0; // Tổng tiền của giỏ hàng
 
         foreach ($cart_items as $item_id => $quantity) {
-            $query = "SELECT tenhang, dongia, mota, hinh FROM hang WHERE mahang = '$item_id'";
+            $query = "SELECT p_name, p_current_price, p_description, p_featured_photo FROM tbl_product WHERE p_id = '$item_id'";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                    $tenhang = htmlspecialchars($row['tenhang']);
-                    $dongia = $row['dongia'];
-                    $formatted_price = number_format($dongia, 0, '.', '.');
-                    $mota = htmlspecialchars($row['mota']);
-                    $hinh = htmlspecialchars($row['hinh']);
-                    $total_item_price = $dongia * $quantity;
+                    $p_name = htmlspecialchars($row['p_name']);
+                    $p_current_price = $row['p_current_price'];
+                    $formatted_price = number_format($p_current_price, 0, '.', '.');
+                    $p_description = htmlspecialchars($row['p_description']);
+                    $p_featured_photo = htmlspecialchars($row['p_featured_photo']);
+                    $total_item_price = $p_current_price * $quantity;
                     $total_price += $total_item_price;
 
                     echo "<tr>";
-                    echo "<td class='product-title'>$tenhang</td>";
+                    echo "<td class='product-title'>$p_name</td>";
                     echo "<td class='price'>$formatted_price VND</td>";
                     echo "<td>
                         <div class='quantity-buttons'>
@@ -422,12 +411,13 @@ $result = $conn->query($sql);
                         </div>
                       </td>";
                     echo "<td class='price'>" . number_format($total_item_price, 0, '.', '.') . " VND</td>";
-                    echo "<td><img src='$hinh' alt='$tenhang'></td>";
+                    echo "<td><img src='$p_featured_photo' alt='$p_name'></td>";
                     echo "<td>
-                        <form method='POST'>
-                            <input type='hidden' name='product_id' value='$item_id'>
-                            <button type='submit' name='remove_item' class='remove-btn'>Xóa</button>
-                        </form>
+                            <form method='POST'>
+                                <input type='hidden' name='product_id' value='". $item_id. "'> 
+                                <button type='submit' name='remove_item' class='remove-btn'>Xóa</button>
+                            </form>
+
                       </td>";
                     echo "</tr>";
                 }
@@ -438,42 +428,38 @@ $result = $conn->query($sql);
         echo "<div class='checkout-bar'>";
         echo "<span class='total-price'>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</span>";
         echo "<form method='POST' action='cart.php'>";
-        if (isset($_SESSION['username'])) {
-            $username = $_SESSION['username'];
+        //  "Buy All" button handling (check for cust_id):
 
-            // Check if the user has a 'makhach'
-            $query = "SELECT makhach FROM account WHERE username = '$username'";
+        if (isset($_SESSION['cust_email'])) {
+            $email = $_SESSION['cust_email'];
+
+            // Truy vấn để lấy cust_id từ bảng tbl_customer
+            $query = "SELECT cust_id FROM tbl_customer WHERE cust_email = '$email'";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                $makhach = $row['makhach'];
+                $cust_id = $row['cust_id'];
 
-                // If 'makhach' is found, proceed with purchase
-                
-                    $_SESSION['makhach'] = $makhach;  // Ensure 'makhach' is in session
-                    // Payment methods INSIDE the form
-                    echo "<div class='payment-methods'>
-        <div class='payment-option'>
-            <input type='radio' id='bank-transfer' name='payment' value='bank-transfer' style='width: 40px; height: 40px;' required>
-            <label for='bank-transfer' style='font-size:3rem'>Thanh Toán Online</label>
-        </div>
-        <div class='payment-option'>
-            <input type='radio' id='cash-on-delivery' name='payment' value='cash-on-delivery' style='width: 40px; height: 40px;' checked>
-            <label for='cash-on-delivery' style='font-size:3rem'>Trả khi nhận hàng</label>
-        </div>
-    </div>";
-
-                    echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>";
-                } else {
-                    // If no 'makhach', set formaction to inputKhach.php
-                    echo "<button type='submit' name='buy_all' class='buy-all-btn' formaction='inputKhach.php'>Mua hàng</button>";
-                }
+                // Thiết lập cust_id vào session
+                $_SESSION['cust_id'] = $cust_id; // Payment methods INSIDE the form
+                echo "<div class='payment-methods'>
+                        <div class='payment-option'>
+                            <input type='radio' id='bank-transfer' name='payment' value='bank-transfer' style='width: 40px; height: 40px;' required>
+                            <label for='bank-transfer' style='font-size:3rem'>Thanh Toán Online</label>
+                        </div>
+                        <div class='payment-option'>
+                            <input type='radio' id='cash-on-delivery' name='payment' value='cash-on-delivery' style='width: 40px; height: 40px;' >
+                            <label for='cash-on-delivery' style='font-size:3rem'>Trả khi nhận hàng</label>
+                        </div>
+                        </div>";
+                echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>"; // Correct formaction
             }
         } else {
             echo "<p>Vui lòng đăng nhập trước khi mua hàng.</p>";
         }
-        echo "</div>";
+    }
+    echo "</div>";
     ?>
 
 </body>

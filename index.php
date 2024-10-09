@@ -66,9 +66,10 @@ if (isset($_POST['buy_now'])) {
 }
 
 
-// Fetch all products from the 'hang' table
-$sql = "SELECT * FROM hang";
-$result = $conn->query($sql);
+// Fetch products from tbl_product (prepared statement)
+$stmt = $conn->prepare("SELECT * FROM tbl_product WHERE p_is_active = 1"); // Assuming p_is_active indicates product visibility
+$stmt->execute();
+$result = $stmt->get_result();
 
 ?>
 <!DOCTYPE html>
@@ -114,7 +115,8 @@ $result = $conn->query($sql);
                         echo '<div class="user-info">';
                         echo '<a href="cart.php"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
                         echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<span class="username">' . htmlspecialchars($_SESSION['username']) . '</span>';
+                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
+                        
                         echo '<a href="logout.php" class="btn">Đăng xuất</a>'; // Nút đăng xuất
                         echo '</div>';
                     } else {
@@ -133,62 +135,58 @@ $result = $conn->query($sql);
             <p class="title">Sản phẩm của chúng tôi</p>
             <div class="main-content">
                 <div class="product-list">
-                    <?php
-                    // Check if there are any products and display them
+                <?php
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
-                            $soluongton = $row["soluongton"];
                             echo '<div class="product-item">';
                             echo '<div class="product-image">';
-                            // Nếu cột hình trống, sử dụng ảnh mặc định
-                            $imagePath = !empty($row["hinh"]) ? $row["hinh"] : 'asset/img/placeholder.png';
-
-                            echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($row["tenhang"]) . '" class="thumb">';
+                            $imagePath = !empty($row['p_featured_photo']) ? $row['p_featured_photo'] : 'asset/img/placeholder.png'; // Placeholder image
+                            echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($row['p_name']) . '" class="thumb">';
                             echo '</div>';
                             echo '<div class="info">';
                             echo '<div class="head">';
-                            echo '<p class="product-title">' . htmlspecialchars($row["tenhang"]) . '</p>';
+                            echo '<p class="product-title">' . htmlspecialchars($row['p_name']) . '</p>';
                             echo '</div>';
-                            echo '<p class="decs">' . htmlspecialchars($row["mota"]) . '</p>';
-                            echo '<div class="price">Giá: ' . number_format($row["dongia"], 0, '.', '.') . ' VND</div>';
-                            if ($soluongton > 0) {
-                                echo '<div class="remain">còn lại: ' . number_format($row["soluongton"], 0, '.', '.') . ' ' . htmlspecialchars($row["donvido"]) . '.</div>';
-                            }
-                            else{
-                                echo '<div class="remain"><u style="color:red">Hết Hàng</u></div>';
-                            }
+                            echo '<p class="decs">' . htmlspecialchars($row['p_short_description']) . '</p>'; // Using short description
+                            echo '<div class="price">Giá: ' . number_format($row['p_current_price'], 0, '.', '.') . ' VND</div>';
+
+                            // Quantity and Stock Handling:  You'll need to decide how to handle sizes and colors
+                            echo '<div class="remain">còn lại: ' . $row['p_qty'] . ' </div>'; //  For now, just showing total quantity. You'll need to refine this.
+
                             echo '<div class="product-buttons">';
-                            if ($soluongton > 0) {
-                                // Form cho nút "Thêm vào giỏ"
-                            echo '<form method="POST" style="display: inline-block;">';
-                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
-                            echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
-                            echo '</form>';
-                            // Form cho nút "Mua ngay"
-                            echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
-                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
-                            echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
-                            echo '</form>';
-                            }     
-                            else {
-                                // Form cho nút "Thêm vào giỏ"
-                            echo '<form method="POST" style="display: inline-block;">';
-                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
-                            echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
-                            echo '</form>';
-                            // Form cho nút "Mua ngay"
-                            echo '<form method="POST" style="display: inline-block;">'; // Remove action attribute
-                            echo '<input type="hidden" name="product_id" value="' . $row["mahang"] . '">';
-                            echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
-                            echo '</form>';
-                            }              
-                            echo '</div>';
-                            echo '</div>';
-                            echo '</div>';
+
+                            if ($row['p_qty'] > 0) {
+                              echo '<form method="POST" style="display: inline-block;">';
+                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                              echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
+                              echo '</form>';
+                              // Form cho nút "Mua ngay"
+                              echo '<form method="POST" style="display: inline-block;">'; 
+                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                              echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
+                              echo '</form>';
+                              }
+                              else{
+                                echo '<form method="POST" style="display: inline-block;">';
+                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                              echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
+                              echo '</form>';
+                              // Form cho nút "Mua ngay"
+                              echo '<form method="POST" style="display: inline-block;">'; 
+                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                              echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
+                              echo '</form>';
+                              }   
+                            echo '</div>'; // product-buttons
+
+                            echo '</div>'; // info
+                            echo '</div>'; // product-item
                         }
                     } else {
-                        echo '<p>Không có sản phẩm nào trong danh mục.</p>';
+                        echo '<p>Không có sản phẩm nào.</p>';
                     }
+                    $stmt->close(); // Close the statement
+
                     ?>
                 </div>
             </div>

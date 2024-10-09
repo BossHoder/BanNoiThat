@@ -1,8 +1,8 @@
 <?php
 // Kết nối đến MySQL database
 $servername = "localhost";
-$username = "root"; // Username của MySQL (thay bằng của bạn)
-$password = "azz123123"; // Mật khẩu của MySQL (thay bằng của bạn)
+$username = "root"; // Thay đổi theo thông tin của bạn
+$password = "azz123123"; // Thay đổi theo thông tin của bạn
 $dbname = "qlbh";
 
 // Tạo kết nối
@@ -13,40 +13,71 @@ if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
 
-// Lấy dữ liệu từ form
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-    // Kiểm tra nếu username hoặc password rỗng
-    if (empty($username) || empty($password)) {
-        echo "Vui lòng nhập đủ thông tin.";
+    $valid = 1;
+    $error_message = '';
+
+    // Kiểm tra tên
+    if(empty($_POST['cust_name'])) {
+        $valid = 0;
+        $error_message .= "Vui lòng nhập tên của bạn.<br>";
+    }
+
+    // Kiểm tra email
+    if(empty($_POST['cust_email'])) {
+        $valid = 0;
+        $error_message .= "Vui lòng nhập email của bạn.<br>";
     } else {
-        // Mã hóa mật khẩu
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-
-        // Chèn dữ liệu vào bảng account
-        $sql = "INSERT INTO account (username, password) VALUES (?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ss", $username, $hashed_password);
-
-        if ($stmt->execute()) {
-            
-
-            // Thêm script JavaScript để chuyển hướng sau 3 giây
-            echo '<script>
-            alert("Bạn đã đky thành công")
-                        window.location.href = "signin.php";
-                  </script>';
+        // Kiểm tra định dạng email
+        if (!filter_var($_POST['cust_email'], FILTER_VALIDATE_EMAIL)) {
+            $valid = 0;
+            $error_message .= "Định dạng email không hợp lệ.<br>";
         } else {
-            echo "Lỗi: " . $stmt->error;
+            // Kiểm tra email đã tồn tại chưa
+            $stmt = $conn->prepare("SELECT * FROM tbl_customer WHERE cust_email = ?");
+            $stmt->bind_param("s", $_POST['cust_email']);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            if($result->num_rows > 0) {
+                $valid = 0;
+                $error_message .= "Email này đã tồn tại.<br>";
+            }
+            $stmt->close();
         }
+    }
 
-        // Đóng statement
+    // Kiểm tra password
+    if(empty($_POST['cust_password']) || empty($_POST['cust_re_password'])) {
+        $valid = 0;
+        $error_message .= "Vui lòng nhập mật khẩu.<br>";
+    } elseif ($_POST['cust_password'] != $_POST['cust_re_password']) {
+        $valid = 0;
+        $error_message .= "Mật khẩu không khớp.<br>";
+    }
+
+    // Nếu không có lỗi, thực hiện đăng ký
+    if($valid == 1) {
+        $token = md5(time());
+        $cust_datetime = date('Y-m-d h:i:s');
+        $cust_timestamp = time();
+        $cust_password = password_hash($_POST['cust_password'], PASSWORD_DEFAULT); // Mã hóa mật khẩu
+
+        // Thực thi câu lệnh SQL để thêm khách hàng
+        $stmt = $conn->prepare("INSERT INTO tbl_customer (cust_name, cust_email, cust_password, cust_token, cust_datetime, cust_timestamp, cust_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $status = 0; // Mặc định trạng thái tài khoản chưa kích hoạt
+        $stmt->bind_param("sssssis", $_POST['cust_name'], $_POST['cust_email'], $cust_password, $token, $cust_datetime, $cust_timestamp, $status);
+        $stmt->execute(); // Gọi hàm thực thi
         $stmt->close();
+
+        echo "<script>
+        alert('Đăng ký thành công!');
+        window.location.href = 'signin.php';
+      </script>";
+    } else {
+        echo $error_message; // Thông báo lỗi
     }
 }
 
-// Đóng kết nối
 $conn->close();
 ?>

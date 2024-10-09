@@ -1,3 +1,10 @@
+<?php include "perm.php";
+$currentPage = basename($_SERVER['PHP_SELF']); // Gets the current page filename
+
+if (!isAllowedPage($currentPage)) {
+    header("Location: index.php");  // Redirect to a default page (e.g., index.php)
+    exit();
+}?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

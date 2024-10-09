@@ -1,167 +1,73 @@
 <?php
-// inputKhach.php
-session_start(); // Start the session to access user data
+session_start();
+$servername = "localhost";  // Tên máy chủ MySQL (thường là localhost)
+$username = "root";         // Tên người dùng MySQL
+$password = "azz123123";             // Mật khẩu của người dùng MySQL
+$dbname = "QLBH";   // Tên database bạn muốn kết nối
 
-include 'conn.php';
+// Tạo kết nối
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-
+// Kiểm tra kết nối
+if ($conn->connect_error) {
+    die("Kết nối thất bại: " . $conn->connect_error . "");
+}
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    // Ensure all required fields are filled
-    if (!empty($_POST['tenkhach']) && !empty($_POST['dienthoai']) && !empty($_POST['diachi'])) {
-
+    if (!empty($_POST['cust_cname']) && !empty($_POST['cust_phone']) && !empty($_POST['address'])) {
         // Lấy dữ liệu từ form
-        $tenkhach = $_POST['tenkhach'];
-        $dienthoai = $_POST['dienthoai'];
-        $diachi = $_POST['diachi'];
+        $cust_cname = $_POST['cust_cname'];
+        $cust_phone = $_POST['cust_phone'];
+        $address = $_POST['address'];
 
-        // Lấy username từ session
-        $username = $_SESSION['username'];
+        // Lấy email đã đăng ký từ session hoặc từ cơ sở dữ liệu
+        $email = $_SESSION['cust_email'];
 
-        // Insert khách hàng information first
-        $insertKhachQuery = "INSERT INTO khach (tenkhach, dienthoai, diachi) VALUES ('$tenkhach', '$dienthoai', '$diachi')";
-        if ($conn->query($insertKhachQuery) === TRUE) {
-            $makhach = $conn->insert_id; // Get the last inserted ID (makhach)
-
-            // Update the account table with makhach
-            $updateAccountQuery = "UPDATE account SET makhach = '$makhach' WHERE username = '$username'";
-            if ($conn->query($updateAccountQuery) === TRUE) {
-                $_SESSION['makhach'] = $makhach; // Set makhach in session
-                header("Location: cart.php"); // Redirect back to cart.php
-                exit(); // Ensure script stops here
-            } else {
-                echo "Error updating account: " . $conn->error;
-            }
-        } else {
-            echo "Error inserting customer: " . $conn->error;
-        }
+        // Cập nhật thông tin bổ sung vào bảng khách hàng
+        $stmt = $conn->prepare("UPDATE tbl_customer SET cust_cname = ?, cust_phone = ?, cust_address = ? WHERE cust_email = ?");
+        $stmt->bind_param("ssss", $cust_cname, $cust_phone, $address, $email); // "ssss" vì tất cả đều là chuỗi
+        $stmt->execute();
+        // Chuyển hướng sau khi cập nhật thành công
+        header("Location: cart.php");
+        exit();
     } else {
-        
+        echo "Please fill in all required fields.";
     }
-
-    $conn->close();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-
-        h1 {
-            font-size: 3rem;
-            color: #2C3E50;
-            margin-bottom: 20px;
-        }
-
-        .form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .inputTH,
-        .inputDVD,
-        .inputDG {
-            margin-bottom: 15px;
-        }
-
-        .inputTH span,
-        .inputDVD span,
-        .inputDG span {
-            display: block;
-            font-size: 14px;
-            color: #34495e;
-            margin-bottom: 5px;
-            font-size: 2.5rem;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            background-color: #f9f9f9;
-            transition: border-color 0.3s ease-in-out;
-        }
-
-        input[type="text"]:focus,
-        input[type="number"]:focus {
-            border-color: #2C3E50;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            background-color: #2C3E50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease-in-out;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #1A242F;
-        }
-
-        @media screen and (max-width: 768px) {
-            .container {
-                padding: 15px;
-                width: 90%;
-            }
-        }
-    </style>
+    <title>Customer Information</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
-    <form action="" method="post">
-        <div class="container">
-            <div class="header">
-                <h1 style="text-align: center;">Nhập Thông Tin </h1>
-                <div class="form">
-                    <div class="inputTH">
-                        <span>Nhập tên của bạn</span>
-                        <input type="text" name="tenkhach" id="" required>
-                    </div>
-                    <div class="inputDVD">
-                        <span>Nhập số điện thoại</span>
-                        <input type="number" name="dienthoai" id="" required>
-                    </div>
-                    <div class="inputDG">
-                        <span>Nhập địa chỉ</span>
-                        <input type="text" name="diachi" id="" required>
-                    </div>
-                    <button type="submit">Xác nhận</button>
-                </div>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">NHẬP THÔNG TIN</h2>
+        <form action="" method="POST" class="space-y-4">
+            <div>
+                <label for="cust_cname" class="block text-sm font-medium text-gray-700 mb-1">Tên Bí Danh</label>
+                <input type="text" name="cust_cname" id="cust_cname" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
-        </div>
-    </form>
-
-
+            <div>
+                <label for="cust_phone" class="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
+                <input type="tel" name="cust_phone" id="cust_phone" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                <textarea name="address" id="address" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-32 resize-none"></textarea>
+            </div>
+            <div>
+                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-300">
+                    Xác Nhận
+                </button>
+            </div>
+        </form>
+    </div>
 </body>
 
 </html>

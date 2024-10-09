@@ -1,16 +1,10 @@
 <?php
-session_start();
-$servername = "localhost";
-$db_username = "root";
-$db_password = "azz123123";
-$dbname = "qlbh";
+include "perm.php";
+$currentPage = basename($_SERVER['PHP_SELF']); // Gets the current page filename
 
-// Kết nối đến database
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+if (!isAllowedPage($currentPage)) {
+    header("Location: index.php");  // Redirect to a default page (e.g., index.php)
+    exit();
 }
 
 // Khởi tạo biến $product để tránh lỗi Undefined variable
@@ -21,7 +15,7 @@ $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
 
 if ($product_id) {
     // Truy vấn thông tin sản phẩm từ database
-    $sql = "SELECT * FROM hang WHERE mahang = ?";
+    $sql = "SELECT * FROM tbl_product WHERE p_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $product_id); // Bind the product ID
     $stmt->execute();
@@ -35,20 +29,20 @@ if ($product_id) {
 
 // Xử lý khi form được submit
 if (isset($_POST['submit_info'])) {
-    // Kiểm tra người dùng đã đăng nhập và có makhach hay chưa
+    // Kiểm tra người dùng đã đăng nhập và có cust_id hay chưa
     if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-        $username = $_SESSION['username'];
-        $sql = "SELECT makhach FROM account WHERE username = ?";
+        $cust_email = $_SESSION['cust_email'];
+        $sql = "SELECT cust_id FROM tbl_customer WHERE cust_email = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $username);
+        $stmt->bind_param("s", $cust_email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Người dùng có makhach, tiến hành xử lý đơn hàng
+            // Người dùng có cust_id, tiến hành xử lý đơn hàng
             $errors = [];
             foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                $query = "SELECT soluongton FROM hang WHERE mahang = ?";
+                $query = "SELECT p_qty FROM tbl_product WHERE p_id = ?";
                 $stmt = $conn->prepare($query);
                 $stmt->bind_param("i", $item_id);
                 $stmt->execute();
@@ -56,10 +50,10 @@ if (isset($_POST['submit_info'])) {
 
                 if ($result->num_rows > 0) {
                     $row = $result->fetch_assoc();
-                    $current_stock = $row['soluongton'];
+                    $current_stock = $row['p_qty'];
                     if ($current_stock >= $quantity) {
                         $new_stock = $current_stock - $quantity;
-                        $update_query = "UPDATE hang SET soluongton = ? WHERE mahang = ?";
+                        $update_query = "UPDATE tbl_product SET p_qty = ? WHERE p_id = ?";
                         $stmt = $conn->prepare($update_query);
                         $stmt->bind_param("ii", $new_stock, $item_id);
                         if (!$stmt->execute()) {
@@ -86,7 +80,7 @@ if (isset($_POST['submit_info'])) {
         }
     }
 
-    // Xử lý nếu người dùng không có makhach hoặc chưa đăng nhập
+    // Xử lý nếu người dùng không có cust_id hoặc chưa đăng nhập
     $hoTenDem = $_POST['first-name'];
     $ten = $_POST['last-name'];
     $tenkhach = $hoTenDem . ' ' . $ten;
@@ -102,17 +96,17 @@ if (isset($_POST['submit_info'])) {
         $last_id = $conn->insert_id;
 
         if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-            $username = $_SESSION['username'];
-            $updateAccount = "UPDATE account SET makhach = ? WHERE username = ?";
-            $stmt = $conn->prepare($updateAccount);
-            $stmt->bind_param("is", $last_id, $username);
+            $cust_email = $_SESSION['cust_email'];
+            $updatetbl_customer = "UPDATE tbl_customer SET cust_id = ? WHERE cust_email = ?";
+            $stmt = $conn->prepare($updatetbl_customer);
+            $stmt->bind_param("is", $last_id, $cust_email);
             $stmt->execute();
         }
 
         if (isset($_SESSION['cart']) && !empty($_SESSION['cart'])) {
             $errors = [];
             foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                $query = "SELECT soluongton FROM hang WHERE mahang = ?";
+                $query = "SELECT p_qty FROM tbl_product WHERE p_id = ?";
                 $stmt = $conn->prepare($query);
                 $stmt->bind_param("i", $item_id);
                 $stmt->execute();
@@ -120,10 +114,10 @@ if (isset($_POST['submit_info'])) {
 
                 if ($result->num_rows > 0) {
                     $row = $result->fetch_assoc();
-                    $current_stock = $row['soluongton'];
+                    $current_stock = $row['p_qty'];
                     if ($current_stock >= $quantity) {
                         $new_stock = $current_stock - $quantity;
-                        $update_query = "UPDATE hang SET soluongton = ? WHERE mahang = ?";
+                        $update_query = "UPDATE tbl_product SET p_qty = ? WHERE p_id = ?";
                         $stmt = $conn->prepare($update_query);
                         $stmt->bind_param("ii", $new_stock, $item_id);
                         if (!$stmt->execute()) {

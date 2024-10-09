@@ -1,6 +1,11 @@
 <?php
-// Kết nối đến file chứa kết nối MySQL
-include 'conn.php';
+include "perm.php";
+$currentPage = basename($_SERVER['PHP_SELF']); // Gets the current page filename
+
+if (!isAllowedPage($currentPage)) {
+    header("Location: index.php");  // Redirect to a default page (e.g., index.php)
+    exit();
+}
 
 // Thực hiện truy vấn hoặc các thao tác khác
 $sql = "SELECT * FROM khach";
