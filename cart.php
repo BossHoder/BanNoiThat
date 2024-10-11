@@ -7,69 +7,41 @@ $dbname = "QLBH";   // Tên database bạn muốn kết nối
 
 // Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
+$conn->set_charset("utf8mb4");
 
 // Kiểm tra kết nối
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error . "");
 }
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-// Xử lý cập nhật số lượng
-if (isset($_POST['update_quantity'])) {
-    $product_id = $_POST['product_id'];
-    $quantity = intval($_POST['quantity']);
+$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
-    // Lấy số lượng tồn kho hiện tại của sản phẩm
-    $query = "SELECT p_qty FROM tbl_product WHERE p_id = '$product_id'";
-    $result = $conn->query($query);
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Cập nhật số lượng sản phẩm
+    if (isset($_POST['update_quantity'])) {
+        $product_id = $_POST['product_id'];
+        $new_quantity = $_POST['quantity'];
 
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $current_stock = intval($row['p_qty']);
-
-        // Kiểm tra nếu số lượng vượt quá số lượng tồn hoặc nhỏ hơn 1
-        if ($quantity <= $current_stock && $quantity >= 1) {
-            // Cập nhật số lượng trong giỏ hàng nếu hợp lệ
-            $_SESSION['cart'][$product_id] = $quantity;
-        } elseif ($quantity > $current_stock) {
-            echo "<script>alert('Số lượng yêu cầu vượt quá số lượng tồn. Hiện còn $current_stock sản phẩm.');</script>";
-        } elseif ($quantity < 1) {
-            echo "<script>alert('Số lượng không thể nhỏ hơn 1.');</script>";
+        // Kiểm tra số lượng không nhỏ hơn 1
+        if ($new_quantity > 0) {
+            $_SESSION['cart'][$product_id] = $new_quantity;
+        } else {
+            unset($_SESSION['cart'][$product_id]); // Xóa sản phẩm nếu số lượng bằng 0
         }
-    } else {
-        echo "<script>alert('Sản phẩm không tồn tại.');</script>";
     }
 
-    header("Location: cart.php");
-    exit();
-}
-
-// Xử lý xóa sản phẩm khỏi giỏ hàng
-if (isset($_POST['remove_item'])) {
-    $product_id = $_POST['product_id'];
-
-    // Debug: kiểm tra xem product_id có đúng không và sản phẩm có trong giỏ hàng không
-    if (isset($_SESSION['cart'][$product_id])) {
-        // Get product name
-        $query = "SELECT p_name FROM tbl_product WHERE p_id = '$product_id'";
-        $result = $conn->query($query);
-        $row = $result->fetch_assoc();
-        $product_name = $row['p_name'];
-
-        // Remove product from cart
+    // Xóa sản phẩm khỏi giỏ hàng
+    if (isset($_POST['remove_item'])) {
+        $product_id = $_POST['product_id'];
         unset($_SESSION['cart'][$product_id]);
-
-        // Alert product name and redirect to cart.php
-        echo "<script>alert('Sản phẩm $product_name đã được xóa khỏi giỏ hàng.'); window.location.href = 'cart.php';</script>";
-    } else {
-        echo "<script>alert('Sản phẩm không tồn tại trong giỏ hàng.'); window.location.href = 'cart.php';</script>";
     }
-    exit();
 }
 
+$cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 // Xử lý mua hàng
 if (isset($_POST['buy_all'])) {
     $paymentMethod = isset($_POST['payment']) ? $_POST['payment'] : null; // Get selected payment method
-    if (!isset($_SESSION['cust_address'])) { // Using cust_id now
+    if (!isset($_SESSION['cust_id'])) {
         header("Location: inputKhach.php"); // You'll need to adapt inputKhach.php
         exit;
     }
@@ -107,9 +79,12 @@ if (isset($_POST['buy_all'])) {
 
             // Start transaction
             $conn->begin_transaction();
+            // Start transaction
+            $conn->begin_transaction();
             try {
-                // tbl_order insert (no equivalent to donhang, directly insert into order table)
-                $payment_id = time(); // Or generate a unique payment ID
+                $payment_id = time(); // Hoặc tạo một payment_id duy nhất khác
+                $buy_date = date('Y-m-d'); // Lấy ngày hiện tại
+
                 foreach ($_SESSION['cart'] as $p_id => $quantity) {
                     $product_stmt = $conn->prepare("SELECT p_current_price, p_qty, p_name FROM tbl_product WHERE p_id = ?");
                     $product_stmt->bind_param("i", $p_id);
@@ -125,36 +100,33 @@ if (isset($_POST['buy_all'])) {
                         throw new Exception("Hết Hàng " . $product['p_name']);
                     }
 
-
                     $unit_price = $product['p_current_price'];
                     $product_name = $product['p_name'];
-                    // ... Get size and color if applicable (you'll need to adapt this based on your cart structure and database) ...
-                    $size = ""; // Replace with actual size logic if needed
-                    $color = ""; // Replace with actual color logic if needed
 
+                    $size = ""; // Thay thế bằng logic size thực tế
+                    $color = ""; // Thay thế bằng logic màu sắc thực tế
 
+                    // Tính tổng tiền cho mỗi sản phẩm
+                    $tongtien += $unit_price * $quantity;
 
-                    $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id) VALUES (?,?,?,?,?,?,?)");
-                    $order_stmt->bind_param("isssiis", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id);
+                    // Câu lệnh INSERT với buy_date
+                    $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, total, buy_date) VALUES (?,?,?,?,?,?,?,?,?)");
+                    $order_stmt->bind_param("isssiisds", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $tongtien, $buy_date);
                     $order_stmt->execute();
 
-
-                    // Update Product Quantity
+                    // Cập nhật số lượng sản phẩm trong kho
                     $new_qty = $product['p_qty'] - $quantity;
                     $update_qty_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
                     $update_qty_stmt->bind_param("ii", $new_qty, $p_id);
                     $update_qty_stmt->execute();
                 }
 
-
-                // You don't need the donhang update as you are inserting directly into tbl_order
-
                 $conn->commit();
                 unset($_SESSION['cart']);
                 echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
             } catch (Exception $e) {
                 $conn->rollback();
-                echo "<p>Lỗi: " . $e->getMessage() . "</p>"; // Handle/display error
+                echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
             }
         }
     }
@@ -372,78 +344,75 @@ $result = $conn->query($sql);
     </header>
     <?php
     // Kiểm tra xem có sản phẩm nào trong giỏ hàng không
-    if (!empty($cart_items)) {
-        echo "<table>";
-        echo "<tr><th>Tên hàng</th><th>Đơn giá</th><th>Số lượng</th><th>Tổng giá</th><th>Hình ảnh</th><th>Hành động</th></tr>";
 
-        $total_price = 0; // Tổng tiền của giỏ hàng
+    echo "<table>";
+    echo "<tr><th>Tên hàng</th><th>Đơn giá</th><th>Số lượng</th><th>Tổng giá</th><th>Hình ảnh</th><th>Hành động</th></tr>";
 
-        foreach ($cart_items as $item_id => $quantity) {
-            $query = "SELECT p_name, p_current_price, p_description, p_featured_photo FROM tbl_product WHERE p_id = '$item_id'";
-            $result = $conn->query($query);
+    $total_price = 0; // Tổng tiền của giỏ hàng
 
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $p_name = htmlspecialchars($row['p_name']);
-                    $p_current_price = $row['p_current_price'];
-                    $formatted_price = number_format($p_current_price, 0, '.', '.');
-                    $p_description = htmlspecialchars($row['p_description']);
-                    $p_featured_photo = htmlspecialchars($row['p_featured_photo']);
-                    $total_item_price = $p_current_price * $quantity;
-                    $total_price += $total_item_price;
+    foreach ($cart_items as $item_id => $quantity) {
+        $query = "SELECT p_name, p_current_price, p_description, p_featured_photo FROM tbl_product WHERE p_id = '$item_id'";
+        $result = $conn->query($query);
 
-                    echo "<tr>";
-                    echo "<td class='product-title'>$p_name</td>";
-                    echo "<td class='price'>$formatted_price VND</td>";
-                    echo "<td>
-                        <div class='quantity-buttons'>
-                            <form method='POST' style='display:inline-block;'>
-                                <input type='hidden' name='product_id' value='$item_id'>
-                                <input type='hidden' name='quantity' value='" . ($quantity - 1) . "'>
-                                <button type='submit' name='update_quantity'>-</button>
-                            </form>
-                            <span class='quantity-display'>$quantity</span>
-                            <form method='POST' style='display:inline-block;'>
-                                <input type='hidden' name='product_id' value='$item_id'>
-                                <input type='hidden' name='quantity' value='" . ($quantity + 1) . "'>
-                                <button type='submit' name='update_quantity'>+</button>
-                            </form>
-                        </div>
-                      </td>";
-                    echo "<td class='price'>" . number_format($total_item_price, 0, '.', '.') . " VND</td>";
-                    echo "<td><img src='$p_featured_photo' alt='$p_name'></td>";
-                    echo "<td>
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $p_name = htmlspecialchars($row['p_name']);
+                $p_current_price = $row['p_current_price'];
+                $formatted_price = number_format($p_current_price, 0, '.', '.');
+                $p_description = htmlspecialchars($row['p_description']);
+                $p_featured_photo = htmlspecialchars($row['p_featured_photo']);
+                $total_item_price = $p_current_price * $quantity;
+                $total_price += $total_item_price;
+
+                echo "<tr>";
+                echo "<td class='product-title'>$p_name</td>";
+                echo "<td class='price'>$formatted_price VND</td>";
+                echo "<td>
+                            <div class='quantity-buttons'>
+                                <form method='POST' style='display:inline-block;'>
+                                    <input type='hidden' name='product_id' value='$item_id'>
+                                    <input type='hidden' name='quantity' value='" . ($quantity - 1) . "'>
+                                    <button type='submit' name='update_quantity'>-</button>
+                                </form>
+                                <span class='quantity-display'>$quantity</span>
+                                <form method='POST' style='display:inline-block;'>
+                                    <input type='hidden' name='product_id' value='$item_id'>
+                                    <input type='hidden' name='quantity' value='" . ($quantity + 1) . "'>
+                                    <button type='submit' name='update_quantity'>+</button>
+                                </form>
+                            </div>
+                          </td>";
+                echo "<td class='price'>" . number_format($total_item_price, 0, '.', '.') . " VND</td>";
+                echo "<td><img src='$p_featured_photo' alt='$p_name'></td>";
+                echo "<td>
                             <form method='POST'>
-                                <input type='hidden' name='product_id' value='". $item_id. "'> 
+                                <input type='hidden' name='product_id' value='" . $item_id . "'>
                                 <button type='submit' name='remove_item' class='remove-btn'>Xóa</button>
                             </form>
-
-                      </td>";
-                    echo "</tr>";
-                }
+                          </td>";
+                echo "</tr>";
             }
         }
+    }
+    echo "</table>";
+    echo "<div class='checkout-bar'>";
+    echo "<span class='total-price'>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</span>";
+    echo "<form method='POST'>";
+    //  "Buy All" button handling (check for cust_id):
 
-        echo "</table>";
-        echo "<div class='checkout-bar'>";
-        echo "<span class='total-price'>Tổng cộng: " . number_format($total_price, 0, '.', '.') . " VND</span>";
-        echo "<form method='POST' action='cart.php'>";
-        //  "Buy All" button handling (check for cust_id):
+    $email = $_SESSION['cust_email'];
 
-        if (isset($_SESSION['cust_email'])) {
-            $email = $_SESSION['cust_email'];
+    // Truy vấn để lấy cust_id từ bảng tbl_customer
+    $query = "SELECT cust_id FROM tbl_customer WHERE cust_email = '$email'";
+    $result = $conn->query($query);
 
-            // Truy vấn để lấy cust_id từ bảng tbl_customer
-            $query = "SELECT cust_id FROM tbl_customer WHERE cust_email = '$email'";
-            $result = $conn->query($query);
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $cust_id = $row['cust_id'];
 
-            if ($result->num_rows > 0) {
-                $row = $result->fetch_assoc();
-                $cust_id = $row['cust_id'];
-
-                // Thiết lập cust_id vào session
-                $_SESSION['cust_id'] = $cust_id; // Payment methods INSIDE the form
-                echo "<div class='payment-methods'>
+        // Thiết lập cust_id vào session
+        $_SESSION['cust_id'] = $cust_id; // Payment methods INSIDE the form
+        echo "<div class='payment-methods'>
                         <div class='payment-option'>
                             <input type='radio' id='bank-transfer' name='payment' value='bank-transfer' style='width: 40px; height: 40px;' required>
                             <label for='bank-transfer' style='font-size:3rem'>Thanh Toán Online</label>
@@ -453,12 +422,10 @@ $result = $conn->query($sql);
                             <label for='cash-on-delivery' style='font-size:3rem'>Trả khi nhận hàng</label>
                         </div>
                         </div>";
-                echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>"; // Correct formaction
-            }
-        } else {
-            echo "<p>Vui lòng đăng nhập trước khi mua hàng.</p>";
-        }
+        echo "<button type='submit' name='buy_all' class='buy-all-btn'>Mua hàng</button>"; // Correct formaction
     }
+
+
     echo "</div>";
     ?>
 

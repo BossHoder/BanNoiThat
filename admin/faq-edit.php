@@ -47,7 +47,7 @@ if(!isset($_REQUEST['id'])) {
 		<h1>Edit FAQ</h1>
 	</div>
 	<div class="content-header-right">
-		<a href="faq.php" class="btn btn-primary btn-sm">View All</a>
+		<a href="faq.php" class="btn btn-primary btn-sm">Xem toàn bộ loại hàng</a>
 	</div>
 </section>
 

@@ -19,6 +19,7 @@ if(!isset($_REQUEST['id'])) {
 
 <?php
 	
+	$p_ids = []; // Khởi tạo $p_ids thành một mảng rỗng
 
 	// Getting all ecat ids
 	$statement = $pdo->prepare("SELECT * FROM tbl_product WHERE ecat_id=?");

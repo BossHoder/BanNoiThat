@@ -26,16 +26,23 @@ if (isset($_POST['add_to_cart'])) {
     if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
         echo "<script>
             alert('Bạn cần phải đăng nhập để thêm vào giỏ hàng.');
-                window.location.href = 'signin.php';
+            window.location.href = 'signin.php';
         </script>";
     } else {
         $product_id = $_POST['product_id'];
-        // Kiểm tra xem sản phẩm đã có trong giỏ chưa, nếu có thì tăng số lượng
+
         if (isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] += 1;
+            $_SESSION['cart'][$product_id] = (int)$_SESSION['cart'][$product_id] + 1; // Ép kiểu về int trước khi cộng
         } else {
+            // Nếu chưa có sản phẩm trong giỏ, thêm sản phẩm vào giỏ với số lượng 1
             $_SESSION['cart'][$product_id] = 1;
         }
+
+        // Optional: Chuyển hướng hoặc thông báo sau khi thêm vào giỏ hàng
+        echo "<script>
+            alert('Sản phẩm đã được thêm vào giỏ hàng.');
+            window.location.href = 'index.php'; // Điều hướng đến trang giỏ hàng nếu cần
+        </script>";
     }
 }
 
@@ -149,7 +156,7 @@ $result = $stmt->get_result();
                             echo '</div>';
                             echo '<p class="decs">' . htmlspecialchars($row['p_short_description']) . '</p>'; // Using short description
                             echo '<div class="price">Giá: ' . number_format($row['p_current_price'], 0, '.', '.') . ' VND</div>';
-
+                            
                             // Quantity and Stock Handling:  You'll need to decide how to handle sizes and colors
                             echo '<div class="remain">còn lại: ' . $row['p_qty'] . ' </div>'; //  For now, just showing total quantity. You'll need to refine this.
 

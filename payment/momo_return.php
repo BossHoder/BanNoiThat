@@ -12,6 +12,10 @@ $conn = new mysqli($servername, $db_username, $db_password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+echo "<pre>";
+print_r($_SESSION['cart']);
+echo "</pre>";
+
 
 // Nhận kết quả trả về từ MoMo
 $orderId = $_GET['orderId'];
@@ -20,82 +24,52 @@ $message = $_GET['message'];
 
 if ($resultCode == 0) {
     // Giao dịch thành công, tiến hành lưu vào cơ sở dữ liệu
-    $makhach = isset($_SESSION['makhach']) ? $_SESSION['makhach'] : null;
+    $makhach = isset($_SESSION['cust_id']) ? $_SESSION['cust_id'] : null;
     $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
     $tongtien = 0;
 
     // Kiểm tra giỏ hàng
-    if (!empty($cart_items)) {
+    if (!empty($cart_items) && $makhach !== null) {
         // Bắt đầu giao dịch SQL
         $conn->begin_transaction();
         try {
             // Lấy ngày hiện tại
             $ngaythang = date("Y-m-d");
-
-            // Thêm vào bảng donhang
-            $sql_donhang = "INSERT INTO donhang (makhach, ngaythang, tongtien) VALUES (?, ?, ?)";
-            $stmt_donhang = $conn->prepare($sql_donhang);
-            $stmt_donhang->bind_param("isd", $makhach, $ngaythang, $tongtien);
-            if (!$stmt_donhang->execute()) {
-                throw new Exception("Lỗi khi thêm đơn hàng: " . $stmt_donhang->error);
-            }
-            $madh = $conn->insert_id; // Lấy mã đơn hàng vừa tạo
-
-            // Lặp qua các sản phẩm trong giỏ hàng và thêm vào chitietdonhang
-            foreach ($cart_items as $mahang => $soluong) {
-                // Lấy thông tin sản phẩm (đơn giá)
-                $sql_product = "SELECT dongia FROM hang WHERE mahang = ?";
-                $stmt_product = $conn->prepare($sql_product);
-                $stmt_product->bind_param("i", $mahang);
-                $stmt_product->execute();
-                $result_product = $stmt_product->get_result();
-
-                if ($result_product->num_rows > 0) {
-                    $product = $result_product->fetch_assoc();
-                    $dongia = $product['dongia'];
-                    $thanhtien = $dongia * $soluong;
-                    $tongtien += $thanhtien;
-
-                    // Thêm vào bảng chitietdonhang
-                    $sql_chitietdonhang = "INSERT INTO chitietdonhang (madh, mahang, soluong, thanhtien) VALUES (?, ?, ?, ?)";
-                    $stmt_chitietdonhang = $conn->prepare($sql_chitietdonhang);
-                    $stmt_chitietdonhang->bind_param("iiid", $madh, $mahang, $soluong, $thanhtien);
-                    if (!$stmt_chitietdonhang->execute()) {
-                        throw new Exception("Lỗi khi thêm chi tiết đơn hàng: " . $stmt_chitietdonhang->error);
-                    }
+            $tongtien = 0;
+            foreach ($_SESSION['cart'] as $p_id => $quantity) {
+                // Lấy thông tin sản phẩm
+                $product_stmt = $conn->prepare("SELECT p_current_price, p_qty, p_name FROM tbl_product WHERE p_id = ?");
+                $product_stmt->bind_param("i", $p_id);
+                $product_stmt->execute();
+                $product_result = $product_stmt->get_result();
+                $product = $product_result->fetch_assoc();
+            
+                if (!$product) {
+                    throw new Exception("Không tìm thấy sản phẩm.");
                 }
-            }
-
-            // Cập nhật tổng tiền cho đơn hàng trong bảng donhang
-            $sql_update_donhang = "UPDATE donhang SET tongtien = ? WHERE madh = ?";
-            $stmt_update_donhang = $conn->prepare($sql_update_donhang);
-            $stmt_update_donhang->bind_param("di", $tongtien, $madh);
-            if (!$stmt_update_donhang->execute()) {
-                throw new Exception("Lỗi khi cập nhật tổng tiền: " . $stmt_update_donhang->error);
-            }
-
-            // Thêm vào bảng hoadon
-            $ngayxuat = date("Y-m-d");
-            $sql_hoadon = "INSERT INTO hoadon (makhach, ngayxuat, tongtien) VALUES (?, ?, ?)";
-            $stmt_hoadon = $conn->prepare($sql_hoadon);
-            $stmt_hoadon->bind_param("isd", $makhach, $ngayxuat, $tongtien);
-            if (!$stmt_hoadon->execute()) {
-                throw new Exception("Lỗi khi thêm hóa đơn: " . $stmt_hoadon->error);
-            }
-            $mahd = $conn->insert_id; // Lấy mã hóa đơn vừa tạo
-
-            // Thêm chi tiết hóa đơn vào bảng chitiethd
-            foreach ($cart_items as $mahang => $soluong) {
-                $thanhtien = $dongia * $soluong;
-
-                $sql_chitiethd = "INSERT INTO chitiethd (mahd, mahang, soluong, thanhtien) VALUES (?, ?, ?, ?)";
-                $stmt_chitiethd = $conn->prepare($sql_chitiethd);
-                $stmt_chitiethd->bind_param("iiid", $mahd, $mahang, $soluong, $thanhtien);
-                if (!$stmt_chitiethd->execute()) {
-                    throw new Exception("Lỗi khi thêm chi tiết hóa đơn: " . $stmt_chitiethd->error);
+            
+                if ($product['p_qty'] < $quantity) {
+                    throw new Exception("Hết hàng " . $product['p_name']);
                 }
+            
+                $unit_price = $product['p_current_price'];
+                $product_name = $product['p_name'];
+                $total_item_price = $unit_price * $quantity; // Tính tổng tiền của từng sản phẩm
+                $tongtien += $total_item_price; // Cộng tổng giá trị toàn đơn hàng
+            
+                // Thêm vào tbl_order
+                $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, total) VALUES (?,?,?,?,?,?,?,?)");
+                $order_stmt->bind_param("isssiisd", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $total_item_price);
+                $order_stmt->execute();
+            
+                // Update Product Quantity
+                $new_qty = $product['p_qty'] - $quantity;
+                $update_qty_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
+                $update_qty_stmt->bind_param("ii", $new_qty, $p_id);
+                $update_qty_stmt->execute();
             }
-
+            
+                        
             // Commit giao dịch
             $conn->commit();
 
@@ -110,6 +84,8 @@ if ($resultCode == 0) {
             $conn->rollback();
             echo "<p style='color:red;'>Lỗi: " . $e->getMessage() . "</p>";
         }
+    } else {
+        echo "<p style='color:red;'>Lỗi: Giỏ hàng trống hoặc khách hàng chưa đăng nhập.</p>";
     }
 } else {
     // Giao dịch thất bại

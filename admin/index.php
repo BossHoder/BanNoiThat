@@ -39,39 +39,11 @@ $total_order_complete_shipping_pending = $statement->rowCount();
 ?>
 
 <section class="content">
-	<div class="row">
 		<div class="col-md-4 col-sm-6 col-xs-12">
 			<div class="info-box">
 				<span class="info-box-icon bg-aqua"><i class="fa fa-hand-o-right"></i></span>
 				<div class="info-box-content">
-					<span class="info-box-text">Top Categories</span>
-					<span class="info-box-number"><?php echo $total_top_category; ?></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6 col-xs-12">
-			<div class="info-box">
-				<span class="info-box-icon bg-aqua"><i class="fa fa-hand-o-right"></i></span>
-				<div class="info-box-content">
-					<span class="info-box-text">Mid Categories</span>
-					<span class="info-box-number"><?php echo $total_mid_category; ?></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6 col-xs-12">
-			<div class="info-box">
-				<span class="info-box-icon bg-aqua"><i class="fa fa-hand-o-right"></i></span>
-				<div class="info-box-content">
-					<span class="info-box-text">End Categories</span>
-					<span class="info-box-number"><?php echo $total_end_category; ?></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6 col-xs-12">
-			<div class="info-box">
-				<span class="info-box-icon bg-aqua"><i class="fa fa-hand-o-right"></i></span>
-				<div class="info-box-content">
-					<span class="info-box-text">Products</span>
+					<span class="info-box-text">Số sản phẩm</span>
 					<span class="info-box-number"><?php echo $total_product; ?></span>
 				</div>
 			</div>
@@ -80,7 +52,7 @@ $total_order_complete_shipping_pending = $statement->rowCount();
 			<div class="info-box">
 				<span class="info-box-icon bg-green"><i class="fa fa-hand-o-right"></i></span>
 				<div class="info-box-content">
-					<span class="info-box-text">Completed Orders</span>
+					<span class="info-box-text">Số đơn hàng đặt thành công</span>
 					<span class="info-box-number"><?php echo $total_order_completed; ?></span>
 				</div>
 			</div>
@@ -89,26 +61,8 @@ $total_order_complete_shipping_pending = $statement->rowCount();
 			<div class="info-box">
 				<span class="info-box-icon bg-green"><i class="fa fa-hand-o-right"></i></span>
 				<div class="info-box-content">
-					<span class="info-box-text">Completed Shipping</span>
+					<span class="info-box-text">Số đơn đã giao hàng</span>
 					<span class="info-box-number"><?php echo $total_shipping_completed; ?></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6 col-xs-12">
-			<div class="info-box">
-				<span class="info-box-icon bg-red"><i class="fa fa-hand-o-right"></i></span>
-				<div class="info-box-content">
-					<span class="info-box-text">Pending Orders</span>
-					<span class="info-box-number"><?php echo $total_order_pending; ?></span>
-				</div>
-			</div>
-		</div>
-		<div class="col-md-4 col-sm-6 col-xs-12">
-			<div class="info-box">
-				<span class="info-box-icon bg-red"><i class="fa fa-hand-o-right"></i></span>
-				<div class="info-box-content">
-					<span class="info-box-text">Pending Shipping (Order Completed)</span>
-					<span class="info-box-number"><?php echo $total_order_complete_shipping_pending; ?></span>
 				</div>
 			</div>
 		</div>

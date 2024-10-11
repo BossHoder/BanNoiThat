@@ -4,27 +4,17 @@
 if(isset($_POST['form1'])) {
 	$valid = 1;
 
-    if(empty($_POST['tcat_id'])) {
-        $valid = 0;
-        $error_message .= "You must have to select a top level category<br>";
-    }
-
-    if(empty($_POST['mcat_id'])) {
-        $valid = 0;
-        $error_message .= "You must have to select a mid level category<br>";
-    }
-
     if(empty($_POST['ecat_name'])) {
         $valid = 0;
-        $error_message .= "End level category name can not be empty<br>";
+        $error_message .= "Tên loại hàng không được trống";
     }
 
     if($valid == 1) {    	
 		// updating into the database
-		$statement = $pdo->prepare("UPDATE tbl_end_category SET ecat_name=?,mcat_id=? WHERE ecat_id=?");
-		$statement->execute(array($_POST['ecat_name'],$_POST['mcat_id'],$_REQUEST['id']));
+		$statement = $pdo->prepare("UPDATE tbl_end_category SET ecat_name=? WHERE ecat_id=?");
+		$statement->execute(array($_POST['ecat_name'],$_REQUEST['id']));
 
-    	$success_message = 'End Level Category is updated successfully.';
+    	$success_message = 'Sửa thành công';
     }
 }
 ?>
@@ -54,10 +44,10 @@ if(!isset($_REQUEST['id'])) {
 
 <section class="content-header">
 	<div class="content-header-left">
-		<h1>Edit End Level Category</h1>
+		<h1>Sửa loại hàng</h1>
 	</div>
 	<div class="content-header-right">
-		<a href="end-category.php" class="btn btn-primary btn-sm">View All</a>
+		<a href="end-category.php" class="btn btn-primary btn-sm">Xem toàn bộ loại hàng</a>
 	</div>
 </section>
 
@@ -65,8 +55,6 @@ if(!isset($_REQUEST['id'])) {
 <?php							
 foreach ($result as $row) {
 	$ecat_name = $row['ecat_name'];
-    $mcat_id = $row['mcat_id'];
-    $tcat_id = $row['tcat_id'];
 }
 ?>
 
@@ -96,44 +84,9 @@ foreach ($result as $row) {
         <div class="box box-info">
 
             <div class="box-body">
+                
                 <div class="form-group">
-                    <label for="" class="col-sm-3 control-label">Top Level Category Name <span>*</span></label>
-                    <div class="col-sm-4">
-                        <select name="tcat_id" class="form-control select2 top-cat">
-                            <option value="">Select Top Level Category</option>
-                            <?php
-                            $statement = $pdo->prepare("SELECT * FROM tbl_top_category ORDER BY tcat_name ASC");
-                            $statement->execute();
-                            $result = $statement->fetchAll(PDO::FETCH_ASSOC);   
-                            foreach ($result as $row) {
-                                ?>
-                                <option value="<?php echo $row['tcat_id']; ?>" <?php if($row['tcat_id'] == $tcat_id){echo 'selected';} ?>><?php echo $row['tcat_name']; ?></option>
-                                <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="" class="col-sm-3 control-label">Mid Level Category Name <span>*</span></label>
-                    <div class="col-sm-4">
-                        <select name="mcat_id" class="form-control select2 mid-cat">
-                            <option value="">Select Mid Level Category</option>
-                            <?php
-                            $statement = $pdo->prepare("SELECT * FROM tbl_mid_category WHERE tcat_id = ? ORDER BY mcat_name ASC");
-                            $statement->execute(array($tcat_id));
-                            $result = $statement->fetchAll(PDO::FETCH_ASSOC);   
-                            foreach ($result as $row) {
-                                ?>
-                                <option value="<?php echo $row['mcat_id']; ?>" <?php if($row['mcat_id'] == $mcat_id){echo 'selected';} ?>><?php echo $row['mcat_name']; ?></option>
-                                <?php
-                            }
-                            ?>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="" class="col-sm-3 control-label">End Level Category Name <span>*</span></label>
+                    <label for="" class="col-sm-3 control-label">Sửa tên loại hàng<span>*</span></label>
                     <div class="col-sm-4">
                         <input type="text" class="form-control" name="ecat_name" value="<?php echo $ecat_name; ?>">
                     </div>
@@ -142,7 +95,7 @@ foreach ($result as $row) {
                 <div class="form-group">
                 	<label for="" class="col-sm-3 control-label"></label>
                     <div class="col-sm-6">
-                      <button type="submit" class="btn btn-success pull-left" name="form1">Update</button>
+                      <button type="submit" class="btn btn-success pull-left" name="form1">Cập nhật</button>
                     </div>
                 </div>
 

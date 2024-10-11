@@ -5,10 +5,13 @@ $partnerCode = "MOMO";
 $accessKey = "F8BBA842ECF85";
 $secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
 $orderInfo = "Thanh toán đơn hàng Nội Thất Theanhdola";
-$amount = strval($total_price); // Tổng tiền giỏ hàng
+$total_price = 600000; // Tổng tiền giỏ hàng, đặt giá trị cố định hoặc lấy từ session
+$amount = strval($total_price);
 $orderId = time(); // Tạo mã đơn hàng
-$returnUrl = "http://localhost:3000/payment/momo_return.php"; // URL trả kết quả khi giao dịch thành công
-$notifyUrl = "http://localhost:3000/payment/momo_notify.php"; // URL nhận thông báo từ MoMo
+
+// Địa chỉ đầy đủ
+$returnUrl = "http://localhost:3000/BanNoiThat/payment/momo_return.php"; // URL trả kết quả khi giao dịch thành công
+$notifyUrl = "http://localhost:3000/BanNoiThat/payment/momo_notify.php"; // URL nhận thông báo từ MoMo
 $extraData = "";
 
 // Tạo yêu cầu thanh toán MoMo
@@ -42,10 +45,18 @@ curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
 
 $result = curl_exec($ch);
+if(curl_errno($ch)) {
+    echo 'Lỗi CURL: ' . curl_error($ch);
+}
 $jsonResult = json_decode($result, true);  // Giải mã kết quả trả về từ MoMo
 curl_close($ch);
 
-// Chuyển hướng người dùng đến trang thanh toán của MoMo
-header('Location: ' . $jsonResult['payUrl']);
-exit;
+// Kiểm tra kết quả trả về và chuyển hướng
+if (!empty($jsonResult['payUrl'])) {
+    header('Location: ' . $jsonResult['payUrl']);
+    exit;
+} else {
+    echo "<p>Lỗi: Không thể lấy URL thanh toán từ MoMo. Vui lòng thử lại.</p>";
+    var_dump($jsonResult); // Debug thông tin trả về từ MoMo
+}
 ?>
