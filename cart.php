@@ -38,18 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-// Xử lý mua hàng
-if (isset($_POST['buy_all'])) {
-    $paymentMethod = isset($_POST['payment']) ? $_POST['payment'] : null; // Get selected payment method
-    if (!isset($_SESSION['cust_id'])) {
-        header("Location: inputKhach.php"); // You'll need to adapt inputKhach.php
-        exit;
-    }
-    $cust_id = $_SESSION['cust_id']; // Use cust_id
+    // Xử lý mua hàng
+    if (isset($_POST['buy_all'])) {
+        $paymentMethod = isset($_POST['payment']) ? $_POST['payment'] : null; // Lấy phương thức thanh toán
 
-    if ($paymentMethod == 'bank-transfer') {
-        // Thanh toán qua MoMo
-        $total_price = 0; // Tính tổng tiền của giỏ hàng
+        if (!isset($_SESSION['cust_id'])) {
+            header("Location: inputKhach.php"); // Chuyển hướng đến trang nhập thông tin khách hàng nếu chưa đăng nhập
+            exit;
+        }
+
+        $cust_id = $_SESSION['cust_id']; // Lấy ID khách hàng từ session
+        $cust_name = $_SESSION['cust_name']; // Lấy tên khách hàng từ session
+        $cust_email = $_SESSION['cust_email']; // Lấy email khách hàng từ session
+
+        $total_price = 0; // Tổng tiền của giỏ hàng
         foreach ($cart_items as $item_id => $quantity) {
             $query = "SELECT p_current_price FROM tbl_product WHERE p_id = '$item_id'";
             $result = $conn->query($query);
@@ -61,77 +63,77 @@ if (isset($_POST['buy_all'])) {
             }
         }
 
-        // Thực hiện yêu cầu thanh toán MoMo
-        require 'payment/momo_payment.php'; // Gọi file xử lý MoMo
+        // Start transaction
+        $conn->begin_transaction();
 
-        // Kết thúc xử lý và không tiếp tục xử lý các phương thức thanh toán khác
-        exit;
-    } else {
-        if (isset($_SESSION['cust_id'])) {
-            // Proceed with purchase logic here, e.g., reduce stock, log purchase, etc.
-            $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-            $errors = [];
+        try {
+            $payment_id = time(); // Hoặc tạo một payment_id duy nhất khác
+            $buy_date = date('Y-m-d'); // Lấy ngày hiện tại
+            $tongtien = 0; // Khởi tạo tổng tiền
 
-            $cust_id = $_SESSION['cust_id'];
-            $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
-            $errors = [];
-            $tongtien = 0; // Initialize total price
+            // Xử lý đơn hàng cho từng sản phẩm trong giỏ hàng
+            foreach ($_SESSION['cart'] as $p_id => $quantity) {
+                $product_stmt = $conn->prepare("SELECT p_current_price, p_qty, p_name FROM tbl_product WHERE p_id = ?");
+                $product_stmt->bind_param("i", $p_id);
+                $product_stmt->execute();
+                $product_result = $product_stmt->get_result();
+                $product = $product_result->fetch_assoc();
 
-            // Start transaction
-            $conn->begin_transaction();
-            // Start transaction
-            $conn->begin_transaction();
-            try {
-                $payment_id = time(); // Hoặc tạo một payment_id duy nhất khác
-                $buy_date = date('Y-m-d'); // Lấy ngày hiện tại
-
-                foreach ($_SESSION['cart'] as $p_id => $quantity) {
-                    $product_stmt = $conn->prepare("SELECT p_current_price, p_qty, p_name FROM tbl_product WHERE p_id = ?");
-                    $product_stmt->bind_param("i", $p_id);
-                    $product_stmt->execute();
-                    $product_result = $product_stmt->get_result();
-                    $product = $product_result->fetch_assoc();
-
-                    if (!$product) {
-                        throw new Exception("Không tìm thấy sp.");
-                    }
-
-                    if ($product['p_qty'] < $quantity) {
-                        throw new Exception("Hết Hàng " . $product['p_name']);
-                    }
-
-                    $unit_price = $product['p_current_price'];
-                    $product_name = $product['p_name'];
-
-                    $size = ""; // Thay thế bằng logic size thực tế
-                    $color = ""; // Thay thế bằng logic màu sắc thực tế
-
-                    // Tính tổng tiền cho mỗi sản phẩm
-                    $tongtien += $unit_price * $quantity;
-
-                    // Câu lệnh INSERT với buy_date
-                    $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, total, buy_date) VALUES (?,?,?,?,?,?,?,?,?)");
-                    $order_stmt->bind_param("isssiisds", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $tongtien, $buy_date);
-                    $order_stmt->execute();
-
-                    // Cập nhật số lượng sản phẩm trong kho
-                    $new_qty = $product['p_qty'] - $quantity;
-                    $update_qty_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
-                    $update_qty_stmt->bind_param("ii", $new_qty, $p_id);
-                    $update_qty_stmt->execute();
+                if (!$product) {
+                    throw new Exception("Không tìm thấy sản phẩm.");
                 }
 
-                $conn->commit();
-                unset($_SESSION['cart']);
-                echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
-            } catch (Exception $e) {
-                $conn->rollback();
-                echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
+                if ($product['p_qty'] < $quantity) {
+                    throw new Exception("Hết Hàng " . $product['p_name']);
+                }
+
+                $unit_price = $product['p_current_price'];
+                $product_name = $product['p_name'];
+
+                $size = ""; // Logic xử lý size nếu cần
+                $color = ""; // Logic xử lý màu sắc nếu cần
+
+                // Tính tổng tiền cho mỗi sản phẩm
+                $tongtien += $unit_price * $quantity;
+
+                // Câu lệnh INSERT vào bảng tbl_order với buy_date
+                $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, total, buy_date) 
+                                              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                $order_stmt->bind_param("isssiisds", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $tongtien, $buy_date);
+                $order_stmt->execute();
+
+                // Cập nhật số lượng sản phẩm trong kho
+                $new_qty = $product['p_qty'] - $quantity;
+                $update_qty_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
+                $update_qty_stmt->bind_param("ii", $new_qty, $p_id);
+                $update_qty_stmt->execute();
             }
+
+            // Xử lý thông tin thanh toán
+            $payment_method = $paymentMethod;
+            $payment_status = $payment_method === 'bank-transfer' ? 'pending' : 'completed'; // Tùy theo phương thức thanh toán
+            $payment_date = date('Y-m-d H:i:s');
+            $paid_amount = $tongtien; // Tổng số tiền đã thanh toán
+            $txnid = uniqid(); // Mã giao dịch duy nhất
+            $payment_id = time(); // Mã thanh toán duy nhất (hoặc tạo mã khác)
+
+            // Chèn vào bảng tbl_payment
+            $payment_stmt = $conn->prepare("INSERT INTO tbl_payment (customer_id, customer_name, customer_email, payment_date, txnid, paid_amount, payment_method, payment_status, payment_id) 
+                                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $payment_stmt->bind_param("issssiiss", $cust_id, $cust_name, $cust_email, $payment_date, $txnid, $paid_amount, $payment_method, $payment_status, $payment_id);
+            $payment_stmt->execute();
+
+            // Hoàn tất giao dịch
+            $conn->commit();
+            unset($_SESSION['cart']); // Xóa giỏ hàng sau khi hoàn tất mua hàng
+            echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
+        } catch (Exception $e) {
+            $conn->rollback(); // Hủy giao dịch nếu có lỗi xảy ra
+            echo "<script>alert('" . htmlspecialchars($e->getMessage()) . "');</script>";
         }
     }
-}
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
+
 
 // Fetch all products from the 'hang' table
 $sql = "SELECT * FROM tbl_product";

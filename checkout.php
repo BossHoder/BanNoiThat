@@ -3,121 +3,121 @@ include "perm.php";
 $currentPage = basename($_SERVER['PHP_SELF']); // Lấy tên trang hiện tại
 
 if (!isAllowedPage($currentPage)) {
-    header("Location: index.php");  // Chuyển hướng nếu trang không được phép truy cập
-    exit();
+  header("Location: index.php");  // Chuyển hướng nếu trang không được phép truy cập
+  exit();
 }
 
 $product = null;
 $product_id = isset($_GET['product_id']) ? $_GET['product_id'] : null;
 
 if ($product_id) {
-    $stmt = $conn->prepare("SELECT p_id, p_name, p_current_price FROM tbl_product WHERE p_id = ?");
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
+  $stmt = $conn->prepare("SELECT p_id, p_name, p_current_price FROM tbl_product WHERE p_id = ?");
+  $stmt->bind_param("i", $product_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-    if ($result->num_rows > 0) {
-        $product = $result->fetch_assoc();
-        if (!isset($_SESSION['cart'][$product_id])) {
-            $_SESSION['cart'][$product_id] = 1; // Thêm sản phẩm vào giỏ hàng nếu chưa có
-        }
+  if ($result->num_rows > 0) {
+    $product = $result->fetch_assoc();
+    if (!isset($_SESSION['cart'][$product_id])) {
+      $_SESSION['cart'][$product_id] = 1; // Thêm sản phẩm vào giỏ hàng nếu chưa có
     }
+  }
 }
 
 // Xử lý khi form được submit
 if (isset($_POST['submit_info'])) {
-    if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-        $cust_email = $_SESSION['cust_email'];
-        $stmt = $conn->prepare("SELECT cust_id FROM tbl_customer WHERE cust_email = ?");
-        $stmt->bind_param("s", $cust_email);
+  if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+    $cust_email = $_SESSION['cust_email'];
+    $stmt = $conn->prepare("SELECT cust_id FROM tbl_customer WHERE cust_email = ?");
+    $stmt->bind_param("s", $cust_email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+      // Người dùng có cust_id, tiếp tục xử lý đơn hàng
+      $errors = [];
+      foreach ($_SESSION['cart'] as $item_id => $quantity) {
+        $stmt = $conn->prepare("SELECT p_qty FROM tbl_product WHERE p_id = ?");
+        $stmt->bind_param("i", $item_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // Người dùng có cust_id, tiếp tục xử lý đơn hàng
-            $errors = [];
-            foreach ($_SESSION['cart'] as $item_id => $quantity) {
-                $stmt = $conn->prepare("SELECT p_qty FROM tbl_product WHERE p_id = ?");
-                $stmt->bind_param("i", $item_id);
-                $stmt->execute();
-                $result = $stmt->get_result();
+          $row = $result->fetch_assoc();
+          $current_stock = $row['p_qty'];
 
-                if ($result->num_rows > 0) {
-                    $row = $result->fetch_assoc();
-                    $current_stock = $row['p_qty'];
-
-                    if ($current_stock >= $quantity) {
-                        $new_stock = $current_stock - $quantity;
-                        $update_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
-                        $update_stmt->bind_param("ii", $new_stock, $item_id);
-                        if (!$update_stmt->execute()) {
-                            $errors[] = "Lỗi cập nhật sản phẩm $item_id: " . $conn->error;
-                        }
-                    } else {
-                        $errors[] = "Sản phẩm $item_id không đủ hàng.";
-                    }
-                } else {
-                    $errors[] = "Sản phẩm $item_id không tồn tại.";
-                }
+          if ($current_stock >= $quantity) {
+            $new_stock = $current_stock - $quantity;
+            $update_stmt = $conn->prepare("UPDATE tbl_product SET p_qty = ? WHERE p_id = ?");
+            $update_stmt->bind_param("ii", $new_stock, $item_id);
+            if (!$update_stmt->execute()) {
+              $errors[] = "Lỗi cập nhật sản phẩm $item_id: " . $conn->error;
             }
-
-            // Hiển thị lỗi nếu có
-            if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    echo "<p style='color:red;'>$error</p>";
-                }
-                exit;
-            }
-
-            unset($_SESSION['cart']); // Xoá giỏ hàng
-            echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
-            exit;
+          } else {
+            $errors[] = "Sản phẩm $item_id không đủ hàng.";
+          }
+        } else {
+          $errors[] = "Sản phẩm $item_id không tồn tại.";
         }
-    }
+      }
 
-    // Nếu người dùng chưa đăng nhập hoặc không có cust_id
-    $hoTenDem = isset($_POST['first-name']) ? $_POST['first-name'] : '';
-    $ten = isset($_POST['last-name']) ? $_POST['last-name'] : '';
-    $tenkhach = $hoTenDem . ' ' . $ten;
-    $dienthoai = isset($_POST['phone']) ? $_POST['phone'] : '';
-    $diachi = isset($_POST['address']) ? $_POST['address'] : '';
-    $email = isset($_POST['email']) ? $_POST['email'] : '';
-
-    // Thêm thông tin khách hàng mới
-    $stmt = $conn->prepare("INSERT INTO tbl_customer (cust_name, cust_phone, cust_address, cust_email) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $tenkhach, $dienthoai, $diachi, $email);
-
-    if ($stmt->execute()) {
-        $last_id = $conn->insert_id; // Lấy ID của khách hàng vừa tạo
-
-        if ($product) {
-            $p_id = $product['p_id'];
-            $product_name = $product['p_name'];
-            $unit_price = $product['p_current_price'];
-            $quantity = $_SESSION['cart'][$p_id];
-            $total = $unit_price * $quantity;
-
-            // Thêm đơn hàng vào bảng tbl_order
-            $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, Total) VALUES (?,?,?,?,?,?,?,?)");
-            $order_stmt->bind_param("isssiisd", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $total);
-            $order_stmt->execute();
-
-            // Cập nhật thông tin khách hàng nếu người dùng đã đăng nhập
-            if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-                $stmt = $conn->prepare("UPDATE tbl_customer SET cust_id = ? WHERE cust_email = ?");
-                $stmt->bind_param("is", $last_id, $cust_email);
-                $stmt->execute();
-            }
-
-            // Xử lý giỏ hàng
-            unset($_SESSION['cart']); // Xóa giỏ hàng sau khi đặt hàng thành công
-
-            echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
-            exit;
+      // Hiển thị lỗi nếu có
+      if (!empty($errors)) {
+        foreach ($errors as $error) {
+          echo "<p style='color:red;'>$error</p>";
         }
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        exit;
+      }
+
+      unset($_SESSION['cart']); // Xoá giỏ hàng
+      echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
+      exit;
     }
+  }
+
+  // Nếu người dùng chưa đăng nhập hoặc không có cust_id
+  $hoTenDem = isset($_POST['first-name']) ? $_POST['first-name'] : '';
+  $ten = isset($_POST['last-name']) ? $_POST['last-name'] : '';
+  $tenkhach = $hoTenDem . ' ' . $ten;
+  $dienthoai = isset($_POST['phone']) ? $_POST['phone'] : '';
+  $diachi = isset($_POST['address']) ? $_POST['address'] : '';
+  $email = isset($_POST['email']) ? $_POST['email'] : '';
+
+  // Thêm thông tin khách hàng mới
+  $stmt = $conn->prepare("INSERT INTO tbl_customer (cust_name, cust_phone, cust_address, cust_email) VALUES (?, ?, ?, ?)");
+  $stmt->bind_param("ssss", $tenkhach, $dienthoai, $diachi, $email);
+
+  if ($stmt->execute()) {
+    $last_id = $conn->insert_id; // Lấy ID của khách hàng vừa tạo
+
+    if ($product) {
+      $p_id = $product['p_id'];
+      $product_name = $product['p_name'];
+      $unit_price = $product['p_current_price'];
+      $quantity = $_SESSION['cart'][$p_id];
+      $total = $unit_price * $quantity;
+
+      // Thêm đơn hàng vào bảng tbl_order
+      $order_stmt = $conn->prepare("INSERT INTO tbl_order (product_id, product_name, size, color, quantity, unit_price, payment_id, Total) VALUES (?,?,?,?,?,?,?,?)");
+      $order_stmt->bind_param("isssiisd", $p_id, $product_name, $size, $color, $quantity, $unit_price, $payment_id, $total);
+      $order_stmt->execute();
+
+      // Cập nhật thông tin khách hàng nếu người dùng đã đăng nhập
+      if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
+        $stmt = $conn->prepare("UPDATE tbl_customer SET cust_id = ? WHERE cust_email = ?");
+        $stmt->bind_param("is", $last_id, $cust_email);
+        $stmt->execute();
+      }
+
+      // Xử lý giỏ hàng
+      unset($_SESSION['cart']); // Xóa giỏ hàng sau khi đặt hàng thành công
+
+      echo "<script>alert('Đặt hàng thành công!'); window.location.href = 'index.php';</script>";
+      exit;
+    }
+  } else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+  }
 }
 ?>
 

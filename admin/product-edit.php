@@ -28,11 +28,11 @@ if(isset($_POST['form1'])) {
     $path_tmp = $_FILES['p_featured_photo']['tmp_name'];
 
     if($path!='') {
-        $ext = pathinfo( $path, PATHINFO_EXTENSION );
-        $file_name = basename( $path, '.' . $ext );
-        if( $ext!='jpg' && $ext!='png' && $ext!='jpeg' && $ext!='gif' ) {
+		$ext = pathinfo($path, PATHINFO_EXTENSION);
+		$file_name = basename($path, '.' . $ext); // Lấy tên file gốc (không có phần mở rộng)
+        if( $ext!='jpg' && $ext!='png' && $ext!='jpeg' && $ext!='gif' && $ext != 'svg' ) {
             $valid = 0;
-            $error_message .= 'You must have to upload jpg, jpeg, gif or png file<br>';
+            $error_message .= 'You must have to upload jpg, jpeg, gif, svg or png file<br>';
         }
     }
 
@@ -64,7 +64,7 @@ if(isset($_POST['form1'])) {
                 $my_ext1 = pathinfo( $photo[$i], PATHINFO_EXTENSION );
 		        if( $my_ext1=='jpg' || $my_ext1=='png' || $my_ext1=='jpeg' || $my_ext1=='gif' ) {
 		            $final_name1[$m] = $z.'.'.$my_ext1;
-                    move_uploaded_file($photo_temp[$i],"../assets/uploads/product_photos/".$final_name1[$m]);
+                    move_uploaded_file($photo_temp[$i],"../asset/img/".$final_name1[$m]);
                     $m++;
                     $z++;
 		        }
@@ -99,11 +99,7 @@ if(isset($_POST['form1'])) {
         						));
         } else {
 
-        	unlink('../assets/uploads/'.$_POST['current_photo']);
-
-			$final_name = 'product-featured-'.$_REQUEST['id'].'.'.$ext;
-        	move_uploaded_file( $path_tmp, '../assets/uploads/'.$final_name );
-
+			$final_name ='asset/img/'. $file_name . '.' . $ext;
 
         	$statement = $pdo->prepare("UPDATE tbl_product SET 
         							p_name=?, 
@@ -281,7 +277,7 @@ foreach ($result as $row) {
 			                        		?>
 											<tr>
 				                                <td>
-				                                    <img src="../assets/uploads/product_photos/<?php echo $row['photo']; ?>" alt="" style="width:150px;margin-bottom:5px;">
+				                                    <img src="../asset/img/<?php echo $row['photo']; ?>" alt="" style="width:150px;margin-bottom:5px;">
 				                                </td>
 				                                <td style="width:28px;">
 				                                	<a onclick="return confirmDelete();" href="product-other-photo-delete.php?id=<?php echo $row['pp_id']; ?>&id1=<?php echo $_REQUEST['id']; ?>" class="btn btn-danger btn-xs">X</a>

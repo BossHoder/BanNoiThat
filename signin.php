@@ -73,9 +73,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
     <!-- Nhúng style -->
     <link rel="stylesheet" href="asset/css/style.css">
+
 </head>
 
 <body>
+    <div id="popup">
+        <div class="loader"></div>
+        <p id="popup-message"></p>
+    </div>
     <header class="header fixed" style="background-color: #2C3E50;">
         <div class="main-content">
             <div class="body-header">
@@ -136,6 +141,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
     </div>
+    <script type="text/javascript" src="main.js"></script>
+
 </body>
 
 </html>

@@ -4,8 +4,13 @@
     margin: 0;
 }
 
+body {
+    zoom: 67%;
+}
+
 html {
     font-size: 62.5%;
+    scroll-behavior: smooth;
 }
 
 .logo {
@@ -13,6 +18,9 @@ html {
     height: 62px;
 }
 
+.zoom {
+    zoom: 200%;
+}
 
 .signup-form {
     display: flex;
@@ -32,7 +40,6 @@ html {
     background-repeat: no-repeat;
     border-radius: 12px 0 0 12px;
 }
-
 
 a {
     text-decoration: none;
@@ -58,6 +65,59 @@ a {
     gap: 20px;
 }
 
+#popup {
+    display: none; /* Added */
+    flex-direction: column; /* To stack elements vertically */
+    justify-content: center; /* Center vertically */
+    align-items: center; /* Center horizontally */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 800px;
+    height: 500px;
+}
+
+#popup .loader {
+    border: 5px solid #f3f3f3;
+    /* Light grey */
+    border-top: 5px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    animation: spin 1s linear infinite;
+}
+
+#popup p {
+    margin-top: 20px; /* Adjusted */
+    font-size: 1.5rem; /* Reduced the size for better centering */
+}
+
+        #popup.success {
+            border: 2px solid #4CAF50;
+            /* Green for success */
+        }
+
+        #popup.error {
+            border: 2px solid #f44336;
+            /* Red for error */
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
 .header.fixed {
     top: 0;
     width: 100%;
@@ -81,7 +141,7 @@ a {
     width: 600px;
 }
 
-.checkbox input[type=checkbox] {
+.checkbox input[type="checkbox"] {
     transform: scale(3);
 }
 
@@ -103,7 +163,7 @@ label a {
 
 .btn-submit {
     padding: 12px 30px;
-    background-color: #301B52;
+    background-color: #301b52;
     color: white;
     font-size: 4.3rem;
     border: none;
@@ -119,8 +179,6 @@ main {
     /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
     padding-left: 12%;
 }
-
-
 
 .nav ul {
     display: flex;
@@ -138,7 +196,7 @@ main {
 }
 
 .nav a:hover {
-    color: #BDC3C7;
+    color: #bdc3c7;
     font-family: "Times New Roman", Times, serif;
     font-size: 4rem;
     padding-left: 4.5rem;
@@ -146,7 +204,7 @@ main {
 }
 
 .nav a::after {
-    content: '';
+    content: "";
     position: absolute;
     left: 0;
     bottom: -10px;
@@ -154,7 +212,7 @@ main {
     width: 0;
     height: 5px;
     /* Độ dày của đường viền */
-    background-color: #BDC3C7;
+    background-color: #bdc3c7;
     transition: width 0.3s ease;
 }
 
@@ -163,7 +221,7 @@ main {
     /* Độ dài bằng chiều dài của chữ */
 }
 
-.btn-mgl{
+.btn-mgl {
     margin-left: 500px;
 }
 
@@ -178,8 +236,6 @@ main {
     border-radius: 15px;
 }
 
-
-
 .header .action {
     margin-left: 150px;
 }
@@ -191,9 +247,7 @@ main {
     font-style: normal;
     font-weight: 700;
     line-height: normal;
-
 }
-
 
 .title {
     color: var(--Color-Gray-1, #582617);
@@ -214,32 +268,32 @@ main {
     font-size: 4rem;
     text-align: center;
     margin-bottom: 30px;
-    color: #301B52;
+    color: #301b52;
 }
 
 .main {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+    min-height: 143vh;
     background-color: bisque;
     padding-top: 50px;
 }
 
 .product-title {
-    color: #5D4037;
+    color: #5d4037;
     font-size: 4rem;
     font-weight: bold;
     margin: 10px 0;
 }
 
 .price {
-    color: #2C3E50;
+    color: #2c3e50;
     font-size: 4rem;
 }
 
 .decs {
-    color:#2C3E50;
+    color: #2c3e50;
     font-size: 4rem;
     margin-bottom: 10px;
 }
@@ -253,7 +307,7 @@ main {
     align-items: center;
 }
 
-.remain{
+.remain {
     color: rgb(0, 17, 255);
     font-size: 4rem;
 }
@@ -264,12 +318,16 @@ main {
     object-fit: cover;
     border-radius: 15px;
 }
+
 .product-list {
     flex-grow: 1;
     display: flex;
-    flex-wrap: wrap; /* Allows the items to wrap into a new row */
-    justify-content: space-between; /* Spreads items evenly with space between them */
-    gap: 20px; /* Adds some space between products */
+    flex-wrap: wrap;
+    /* Allows the items to wrap into a new row */
+    justify-content: space-between;
+    /* Spreads items evenly with space between them */
+    gap: 20px;
+    /* Adds some space between products */
 }
 
 .product-item {
@@ -277,15 +335,20 @@ main {
     padding: 20px;
     border-radius: 28px;
     width: 30%;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds some shadow for better visual separation */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    /* Adds some shadow for better visual separation */
     margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
-
 
 .product-item:hover .product-buttons {
     opacity: 1;
     /* Hiện các nút khi hover vào sản phẩm */
+}
+
+.product-item:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .add-to-cart,
@@ -300,10 +363,9 @@ main {
     transition: background-color 0.3s ease-in-out;
     font-size: 2rem;
     margin-top: 30px;
-
 }
 
-.buy-now{
+.buy-now {
     margin-left: 10px;
 }
 
@@ -315,8 +377,8 @@ main {
 
 .btn-signup {
     border-radius: 20px;
-    border: 0px solid var(--Gray-6, #F2F2F2);
-    background: #301B52;
+    border: 0px solid var(--Gray-6, #f2f2f2);
+    background: #301b52;
     width: 87px;
     height: 26px;
 }
@@ -328,43 +390,79 @@ main {
 .already-have-account {
     font-size: 3rem;
 }
-.already-have-account a{
+
+.already-have-account a {
     text-decoration: underline;
 }
 
 .menu-loaihang {
-    position: fixed; /* Đặt menu ở vị trí cố định */
-    top: 100px; /* Khoảng cách từ đỉnh của trang */
-    left: 0; /* Đặt menu sát lề trái */
-    width: 250px; /* Đặt chiều rộng của menu */
-    height: 100vh; /* Chiều cao chiếm toàn bộ chiều cao màn hình */
-    background-color: #ECF0F1; /* Màu nền của menu */
+    position: fixed;
+    /* Đặt menu ở vị trí cố định */
+    top: 100px;
+    /* Khoảng cách từ đỉnh của trang */
+    left: 0;
+    /* Đặt menu sát lề trái */
+    width: 250px;
+    /* Đặt chiều rộng của menu */
+    height: 200vh;
+    /* Chiều cao chiếm toàn bộ chiều cao màn hình */
+    background-color: #ecf0f1;
+    /* Màu nền của menu */
     padding: 20px;
     border-right: 4px solid red;
     z-index: 1000px;
 }
 
-.menu-loaihang a{
-    font-size: 4rem;
+.menu-loaihang a:hover {
+    background-color: #3498db;
+    /* Đổi màu nền khi hover */
+    color: white;
+    /* Đổi màu chữ khi hover */
+    transform: translateX(10px);
+    /* Dịch chuyển nhẹ khi hover */
+}
+
+.menu-loaihang a {
+    font-size: 2rem;
+    /* Giảm font-size để phù hợp hơn */
+    text-decoration: none;
+    /* Xóa gạch chân */
+    color: #333;
+    /* Màu chữ mặc định */
+    display: block;
+    /* Đặt link thành khối để có thể hover toàn bộ */
+    padding: 15px 20px;
+    /* Thêm khoảng cách cho đẹp */
+    transition: all 0.3s ease;
+    /* Hiệu ứng chuyển đổi */
+    border-radius: 5px;
 }
 
 .nav-menu-list {
-    list-style-type: none; /* Xóa dấu chấm đầu dòng */
+    list-style-type: none;
+    /* Xóa dấu chấm đầu dòng */
     padding: 0;
-    background-color: #ECF0F1;
+    background-color: #ecf0f1;
+}
+
+.nav-menu-list li:hover {
+    background-color: #e74c3c;
+    /* Thêm màu nền khi hover vào item */
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 .nav-menu-list li {
     margin-bottom: 15px;
 }
 
-
-
 .nav-menu-list a {
-    color: #1d2935; /* Màu chữ trắng */
-    text-decoration: none; /* Xóa gạch chân */
-    font-size: 3rem; /* Kích cỡ chữ */
-    
+    color: #1d2935;
+    /* Màu chữ trắng */
+    text-decoration: none;
+    /* Xóa gạch chân */
+    font-size: 3rem;
+    /* Kích cỡ chữ */
 }
 
 .user-info {
@@ -377,7 +475,7 @@ main {
 .username {
     font-size: 3rem;
     font-weight: bold;
-    color: #ECF0F1;
+    color: #ecf0f1;
 }
 
 .user-icon {
@@ -385,6 +483,3 @@ main {
     width: 100px;
     height: 100px;
 }
-
-
-

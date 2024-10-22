@@ -29,6 +29,10 @@
     border-radius: 10px;
 }
 
+body{
+    zoom:67%;
+}
+
 .heading {
     font-family: "Poppins-SemiBold", Helvetica, sans-serif;
     font-size: 34px;

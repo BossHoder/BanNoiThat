@@ -64,9 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $cust_password = password_hash($_POST['cust_password'], PASSWORD_DEFAULT); // Mã hóa mật khẩu
 
         // Thực thi câu lệnh SQL để thêm khách hàng
-        $stmt = $conn->prepare("INSERT INTO tbl_customer (cust_name, cust_email, cust_password, cust_token, cust_datetime, cust_timestamp, cust_status) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $status = 0; // Mặc định trạng thái tài khoản chưa kích hoạt
-        $stmt->bind_param("sssssis", $_POST['cust_name'], $_POST['cust_email'], $cust_password, $token, $cust_datetime, $cust_timestamp, $status);
+        $stmt = $conn->prepare("INSERT INTO tbl_customer (cust_name, cust_email, cust_password, cust_token, cust_datetime, cust_timestamp, cust_status, cust_country) VALUES (?, ?, ?, ?, ?, ?, ?, 237)");
+        $status = 1;
+        $stmt->bind_param("ssssssi", $_POST['cust_name'], $_POST['cust_email'], $cust_password, $token, $cust_datetime, $cust_timestamp, $status);
+        
         $stmt->execute(); // Gọi hàm thực thi
         $stmt->close();
 

@@ -121,10 +121,10 @@ $result = $stmt->get_result();
                         // Hiển thị tên người dùng và icon
                         echo '<div class="user-info">';
                         echo '<a href="cart.php"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
+                        echo '<div class="user-dropdown"><a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>
+                        <span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
                         
-                        echo '<a href="logout.php" class="btn">Đăng xuất</a>'; // Nút đăng xuất
+                        echo '<a href="logout.php" class="btn">Đăng xuất</a> </div>'; // Nút đăng xuất
                         echo '</div>';
                     } else {
                         // Hiển thị nút Đăng ký nếu chưa đăng nhập
@@ -148,13 +148,15 @@ $result = $stmt->get_result();
                             echo '<div class="product-item">';
                             echo '<div class="product-image">';
                             $imagePath = !empty($row['p_featured_photo']) ? $row['p_featured_photo'] : 'asset/img/placeholder.png'; // Placeholder image
+                            echo '<a href="product-details.php?p_id=' . $row['p_id'] . '">';
                             echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($row['p_name']) . '" class="thumb">';
-                            echo '</div>';
+                            echo '</a>';
+                                                        echo '</div>';
                             echo '<div class="info">';
                             echo '<div class="head">';
                             echo '<p class="product-title">' . htmlspecialchars($row['p_name']) . '</p>';
                             echo '</div>';
-                            echo '<p class="decs">' . htmlspecialchars($row['p_short_description']) . '</p>'; // Using short description
+                            echo '<p class="decs">' . htmlspecialchars($row['p_description']) . '</p>'; // Using short description
                             echo '<div class="price">Giá: ' . number_format($row['p_current_price'], 0, '.', '.') . ' VND</div>';
                             
                             // Quantity and Stock Handling:  You'll need to decide how to handle sizes and colors

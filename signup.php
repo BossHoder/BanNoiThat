@@ -14,6 +14,10 @@
 </head>
 
 <body>
+    <div id="popup">
+        <div class="loader"></div>
+        <p id="popup-message"></p>
+    </div>
     <header class="header fixed" style="background-color: #2C3E50;">
         <div class="main-content">
             <div class="body-header">
@@ -89,6 +93,8 @@
             </div>
         </div>
     </div>
+    <script type="text/javascript" src="main.js"></script>
+
 </body>
 
 </html>

@@ -95,8 +95,9 @@ if (isset($_POST['form1'])) {
 										p_qty,
 										p_featured_photo,
 										p_description,
-										ecat_id
-									) VALUES (?,?,?,?,?,?)");
+										ecat_id,
+										p_is_active
+									) VALUES (?,?,?,?,?,?,1)");
 		$statement->execute(array(
 			$_POST['p_name'],
 			$_POST['p_current_price'],
@@ -115,10 +116,10 @@ if (isset($_POST['form1'])) {
 
 <section class="content-header">
 	<div class="content-header-left">
-		<h1>Add Product</h1>
+		<h1>Thêm Hàng</h1>
 	</div>
 	<div class="content-header-right">
-		<a href="product.php" class="btn btn-primary btn-sm">View All</a>
+		<a href="product.php" class="btn btn-primary btn-sm">Xem toàn bộ hàng</a>
 	</div>
 </section>
 
@@ -149,10 +150,10 @@ if (isset($_POST['form1'])) {
 				<div class="box box-info">
 					<div class="box-body">
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">End Level Category Name <span>*</span></label>
+							<label for="" class="col-sm-3 control-label">Loại hàng <span>*</span></label>
 							<div class="col-sm-4">
 								<select name="ecat_id" class="form-control select2 end-cat">
-									<option value="">Select End Level Category</option>
+									<option value="">Chọn loại hàng</option>
 									<?php
 									$statement = $pdo->prepare("SELECT * FROM tbl_end_category inner join tbl_mid_category on tbl_end_category.mcat_id = tbl_mid_category.mcat_id ORDER BY ecat_name ASC");
 									$statement->execute();
@@ -166,31 +167,31 @@ if (isset($_POST['form1'])) {
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Product Name <span>*</span></label>
+							<label for="" class="col-sm-3 control-label">Tên hàng <span>*</span></label>
 							<div class="col-sm-4">
 								<input type="text" name="p_name" class="form-control">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Current Price <span>*</span><br><span style="font-size:10px;font-weight:normal;">(In USD)</span></label>
+							<label for="" class="col-sm-3 control-label">Đơn giá <span>*</span><br><span style="font-size:10px;font-weight:normal;">(In USD)</span></label>
 							<div class="col-sm-4">
 								<input type="text" name="p_current_price" class="form-control">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Quantity <span>*</span></label>
+							<label for="" class="col-sm-3 control-label">Số lượng <span>*</span></label>
 							<div class="col-sm-4">
 								<input type="text" name="p_qty" class="form-control">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Featured Photo <span>*</span></label>
+							<label for="" class="col-sm-3 control-label">Hình ảnh <span>*</span></label>
 							<div class="col-sm-4" style="padding-top:4px;">
 								<input type="file" name="p_featured_photo">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Other Photos</label>
+							<label for="" class="col-sm-3 control-label">Ảnh khác</label>
 							<div class="col-sm-4" style="padding-top:4px;">
 								<table id="ProductTable" style="width:100%;">
 									<tbody>
@@ -206,19 +207,19 @@ if (isset($_POST['form1'])) {
 								</table>
 							</div>
 							<div class="col-sm-2">
-								<input type="button" id="btnAddNew" value="Add Item" style="margin-top: 5px;margin-bottom:10px;border:0;color: #fff;font-size: 14px;border-radius:3px;" class="btn btn-warning btn-xs">
+								<input type="button" id="btnAddNew" value="Thêm" style="margin-top: 5px;margin-bottom:10px;border:0;color: #fff;font-size: 14px;border-radius:3px;" class="btn btn-warning btn-xs">
 							</div>
 						</div>
 						<div class="form-group">
-							<label for="" class="col-sm-3 control-label">Description</label>
+							<label for="" class="col-sm-3 control-label">Mô tả</label>
 							<div class="col-sm-8">
-								<textarea name="p_description" class="form-control" cols="30" rows="10" id="editor1"></textarea>
+								<textarea name="p_description" class="form-control" cols="30" rows="10" ></textarea>
 							</div>
 						</div>
 						<div class="form-group">
 							<label for="" class="col-sm-3 control-label"></label>
 							<div class="col-sm-6">
-								<button type="submit" class="btn btn-success pull-left" name="form1">Submit</button>
+								<button type="submit" class="btn btn-success pull-left" name="form1">Xác nhận</button>
 							</div>
 						</div>
 					</div>
