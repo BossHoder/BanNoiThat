@@ -1,18 +1,6 @@
 <?php
 session_start();
-$servername = "localhost";  // Tên máy chủ MySQL (thường là localhost)
-$username = "root";         // Tên người dùng MySQL
-$password = "azz123123";             // Mật khẩu của người dùng MySQL
-$dbname = "QLBH";   // Tên database bạn muốn kết nối
-
-// Tạo kết nối
-$conn = new mysqli($servername, $username, $password, $dbname);
-$conn->set_charset("utf8mb4");
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error . "");
-}
+include("conn.php");
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
@@ -334,10 +322,20 @@ $result = $conn->query($sql);
                         // Hiển thị tên người dùng và icon
                         echo '<div class="user-info">';
                         echo '<a href="#"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
+                        echo '<a href="#" class="user-icon-wrapper">';
+                        echo '<img src="asset/img/user-icon.png" alt="User Icon" class="user-icon">';
+                        echo '</a>';
                         echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
-                        echo '<a href="logout.php" class="btn ">Đăng xuất</a>'; // Nút đăng xuất
+                        echo '<div class="dropdown-menu">';
+                        echo '<a href="#">Username: ' . htmlspecialchars($_SESSION['cust_name']) . '</a>';
+                        echo '<a href="changepassword.php">Change Password</a>';
+                        echo '<a href="logout.php">Logout</a>';
                         echo '</div>';
+                        echo '</div>';
+                    }
+                    else {
+                        // Hiển thị nút Đăng ký nếu chưa đăng nhập
+                        echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
                     }
                     ?>
                 </div>

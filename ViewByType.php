@@ -2,16 +2,8 @@
 session_start();
 
 // Database connection code (unchanged)
-$servername = "localhost";
-$db_username = "root";
-$db_password = "azz123123";
-$dbname = "qlbh";
+include("conn.php");
 
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
 
 // Cart initialization (unchanged)
 if (!isset($_SESSION['cart'])) {

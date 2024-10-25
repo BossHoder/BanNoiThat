@@ -465,21 +465,67 @@ main {
     /* Kích cỡ chữ */
 }
 
+/* Dropdown Menu */
 .user-info {
+    position: relative;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-left: 100px;
+    margin-left: 200%;
+    
 }
 
+.user-icon-wrapper {
+    position: relative;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%; /* Adjust this based on the user icon size */
+    right: auto; /* Change from right: 0; to auto */
+    left: 0; /* Position it relative to the new left of .user-info */
+    background-color: #34495e;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 200px;
+}
+
+.dropdown-menu a {
+    display: block;
+    color: #ecf0f1;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-size: 2rem;
+    border-bottom: 1px solid #2c3e50;
+}
+
+.dropdown-menu a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+    background-color: #2c3e50;
+}
+
+/* Show the dropdown when hovering over user-info or dropdown-menu */
+.user-info:hover .dropdown-menu,
+.user-icon-wrapper:hover .dropdown-menu,
+.dropdown-menu:hover {
+    display: block;
+}
+
+/* Adjustments for responsiveness */
 .username {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: bold;
     color: #ecf0f1;
 }
 
 .user-icon {
     border-radius: 50%;
-    width: 100px;
-    height: 100px;
+    width: 80px; /* Adjust as needed */
+    height: 80px; /* Adjust as needed */
 }

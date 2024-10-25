@@ -1,15 +1,7 @@
 <?php
 session_start();
 // Check if the user is logged in
-if (!isset($_SESSION['cust_id'])) {
-    header("Location: signin.php");
-    exit();
-}
-// Database connection
-$conn = new mysqli("localhost", "theanhdola", "azz123123", "qlbh");
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include("conn.php");
 $cust_id = $_SESSION['cust_id'];
 // Query to get customer's orders
 $sql = "SELECT o.payment_id, 

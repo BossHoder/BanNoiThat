@@ -1,19 +1,7 @@
 <?php
 session_start(); // Always start session at the beginning of the file
 
-// Kết nối đến MySQL database
-$servername = "localhost";
-$db_username = "root"; // Thay bằng thông tin đăng nhập của bạn
-$db_password = "azz123123"; // Thay bằng mật khẩu của bạn
-$dbname = "qlbh";
-
-// Tạo kết nối
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
+include("conn.php");
 
 // Khởi tạo giỏ hàng nếu chưa tồn tại
 if (!isset($_SESSION['cart'])) {
@@ -121,15 +109,21 @@ $result = $stmt->get_result();
                         // Hiển thị tên người dùng và icon
                         echo '<div class="user-info">';
                         echo '<a href="cart.php"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<div class="user-dropdown"><a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>
-                        <span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
-                        
-                        echo '<a href="logout.php" class="btn">Đăng xuất</a> </div>'; // Nút đăng xuất
+                        echo '<a href="#" class="user-icon-wrapper">';
+                        echo '<img src="asset/img/user-icon.png" alt="User Icon" class="user-icon">';
+                        echo '</a>';
+                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
+                        echo '<div class="dropdown-menu">';
+                        echo '<a href="#">Tên: ' . htmlspecialchars($_SESSION['cust_name']) . '</a>';
+                        echo '<a href="changepassword.php">Đổi mật khẩu</a>';
+                        echo '<a href="logout.php">Đăng xuất</a>';
                         echo '</div>';
-                    } else {
-                        // Hiển thị nút Đăng ký nếu chưa đăng nhập
-                        echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
-                    }
+                        echo '</div>';
+                        }
+                        else {
+                            // Hiển thị nút Đăng ký nếu chưa đăng nhập
+                            echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
+                        }
                     ?>
                 </div>
             </div>
@@ -142,7 +136,7 @@ $result = $stmt->get_result();
             <p class="title">Sản phẩm của chúng tôi</p>
             <div class="main-content">
                 <div class="product-list">
-                <?php
+                    <?php
                     if ($result->num_rows > 0) {
                         while ($row = $result->fetch_assoc()) {
                             echo '<div class="product-item">';
@@ -151,41 +145,40 @@ $result = $stmt->get_result();
                             echo '<a href="product-details.php?p_id=' . $row['p_id'] . '">';
                             echo '<img src="' . htmlspecialchars($imagePath) . '" alt="' . htmlspecialchars($row['p_name']) . '" class="thumb">';
                             echo '</a>';
-                                                        echo '</div>';
+                            echo '</div>';
                             echo '<div class="info">';
                             echo '<div class="head">';
                             echo '<p class="product-title">' . htmlspecialchars($row['p_name']) . '</p>';
                             echo '</div>';
                             echo '<p class="decs">' . htmlspecialchars($row['p_description']) . '</p>'; // Using short description
                             echo '<div class="price">Giá: ' . number_format($row['p_current_price'], 0, '.', '.') . ' VND</div>';
-                            
+
                             // Quantity and Stock Handling:  You'll need to decide how to handle sizes and colors
                             echo '<div class="remain">còn lại: ' . $row['p_qty'] . ' </div>'; //  For now, just showing total quantity. You'll need to refine this.
 
                             echo '<div class="product-buttons">';
 
                             if ($row['p_qty'] > 0) {
-                              echo '<form method="POST" style="display: inline-block;">';
-                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
-                              echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
-                              echo '</form>';
-                              // Form cho nút "Mua ngay"
-                              echo '<form method="POST" style="display: inline-block;">'; 
-                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
-                              echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
-                              echo '</form>';
-                              }
-                              else{
                                 echo '<form method="POST" style="display: inline-block;">';
-                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
-                              echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
-                              echo '</form>';
-                              // Form cho nút "Mua ngay"
-                              echo '<form method="POST" style="display: inline-block;">'; 
-                              echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
-                              echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
-                              echo '</form>';
-                              }   
+                                echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                                echo '<button type="submit" name="add_to_cart" class="add-to-cart">Thêm vào giỏ</button>';
+                                echo '</form>';
+                                // Form cho nút "Mua ngay"
+                                echo '<form method="POST" style="display: inline-block;">';
+                                echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                                echo '<button type="submit" name="buy_now" class="buy-now">Mua ngay</button>';
+                                echo '</form>';
+                            } else {
+                                echo '<form method="POST" style="display: inline-block;">';
+                                echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                                echo '<button type="submit" name="add_to_cart" class="add-to-cart" disabled>Thêm vào giỏ</button>';
+                                echo '</form>';
+                                // Form cho nút "Mua ngay"
+                                echo '<form method="POST" style="display: inline-block;">';
+                                echo '<input type="hidden" name="product_id" value="' . $row["p_id"] . '">';
+                                echo '<button type="submit" name="buy_now" class="buy-now" disabled>Mua ngay</button>';
+                                echo '</form>';
+                            }
                             echo '</div>'; // product-buttons
 
                             echo '</div>'; // info

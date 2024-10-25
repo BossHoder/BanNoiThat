@@ -1,17 +1,6 @@
 <?php
-// Kết nối đến MySQL database
-$servername = "localhost";
-$username = "root"; // Thay đổi theo thông tin của bạn
-$password = "azz123123"; // Thay đổi theo thông tin của bạn
-$dbname = "qlbh";
+include("conn.php");
 
-// Tạo kết nối
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Kiểm tra kết nối
-if ($conn->connect_error) {
-    die("Kết nối thất bại: " . $conn->connect_error);
-}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
