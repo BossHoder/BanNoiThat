@@ -162,22 +162,23 @@ if (isset($_POST['submit_info'])) {
 
         <?php if ($product): ?>
           <div class="summary-item">
-            <span>Product</span>
+            <span>Sản phẩm</span>
             <span><?php echo htmlspecialchars($product['p_name']); ?></span>
           </div>
           <!-- Quantity Control for each item -->
           <div class="quantity-control">
             <button class="decrement-btn" onclick="updateQuantity(<?php echo $product_id; ?>, -1)">-</button>
-            <input type="text" value="<?php echo $_SESSION['cart'][$product_id]; ?>" id="quantity-<?php echo $product_id; ?>" readonly>
+            <input type="text" value="<?php echo $_SESSION['cart'][$product_id]; ?>"
+              id="quantity-<?php echo $product_id; ?>" readonly>
             <button class="increment-btn" onclick="updateQuantity(<?php echo $product_id; ?>, 1)">+</button>
           </div>
 
           <div class="summary-item">
-            <span>Total</span>
+            <span>Tổng</span>
             <span id="total-price"><?php
                                     $initialTotalPrice = 0;
                                     if (isset($_SESSION['cart']) && $product != null) {
-                                      $quantity =  $_SESSION['cart'][$product_id];
+                                      $quantity = $_SESSION['cart'][$product_id];
                                       $unit_price = $product['p_current_price'];
                                       $initialTotalPrice = $unit_price * $quantity;
                                     }
@@ -192,7 +193,9 @@ if (isset($_POST['submit_info'])) {
         <?php endif; ?>
 
         <p class="privacy-policy">
-          Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên toàn bộ trang web này, để quản lý quyền truy cập vào tài khoản của bạn và cho các mục đích khác được mô tả trong <a href="#" class="privacy-link">chính sách bảo mật</a> của chúng tôi.
+          Dữ liệu cá nhân của bạn sẽ được sử dụng để hỗ trợ trải nghiệm của bạn trên toàn bộ trang web này, để quản lý
+          quyền truy cập vào tài khoản của bạn và cho các mục đích khác được mô tả trong <a href="#"
+            class="privacy-link">chính sách bảo mật</a> của chúng tôi.
         </p>
         <div class="payment-methods">
           <div class="payment-option">
@@ -224,10 +227,9 @@ if (isset($_POST['submit_info'])) {
             var newQuantity = currentQuantity + change;
 
             if (newQuantity < 1) {
-              newQuantity = 1; // Giới hạn số lượng tối thiểu là 1
+              newQuantity = 1; // Minimum quantity limit
             }
 
-            // Sử dụng fetch API để gửi yêu cầu AJAX
             fetch('checkout_process.php', {
                 method: 'POST',
                 headers: {
@@ -235,11 +237,15 @@ if (isset($_POST['submit_info'])) {
                 },
                 body: 'product_id=' + productId + '&new_quantity=' + newQuantity,
               })
-              .then(response => response.text()) // Parse response as text
+              .then(response => response.text())
               .then(data => {
-                console.log(data); // Log the response data for debugging.
+                console.log(data);
                 quantityInput.value = newQuantity;
-                location.reload(); // Reload trang sau khi cập nhật
+
+                // Update total price on the client-side
+                var unitPrice = <?php echo $product['p_current_price']; ?>;
+                var newTotalPrice = unitPrice * newQuantity;
+                document.getElementById("total-price").innerText = newTotalPrice.toLocaleString() + " VND";
               })
               .catch(err => {
                 console.error('Error:', err);

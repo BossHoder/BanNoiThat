@@ -8,6 +8,61 @@ if (isset($_GET['p_id'])) {
 } else {
     die("Product not found!");
 }
+// Khởi tạo giỏ hàng nếu chưa tồn tại
+if (!isset($_SESSION['cart'])) {
+    $_SESSION['cart'] = [];
+}
+// Xử lý thêm vào giỏ hàng
+if (isset($_POST['add_to_cart'])) {
+    // Kiểm tra xem người dùng đã đăng nhập chưa
+    if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+        echo "<script>
+            alert('Bạn cần phải đăng nhập để thêm vào giỏ hàng.');
+            window.location.href = 'signin.php';
+        </script>";
+    } else {
+        $product_id = $_POST['product_id'];
+
+        if (isset($_SESSION['cart'][$product_id])) {
+            $_SESSION['cart'][$product_id] = (int)$_SESSION['cart'][$product_id] + 1; // Ép kiểu về int trước khi cộng
+        } else {
+            // Nếu chưa có sản phẩm trong giỏ, thêm sản phẩm vào giỏ với số lượng 1
+            $_SESSION['cart'][$product_id] = 1;
+        }
+
+        // Optional: Chuyển hướng hoặc thông báo sau khi thêm vào giỏ hàng
+        echo "<script>
+            alert('Sản phẩm đã được thêm vào giỏ hàng.');
+            window.location.href = 'index.php'; // Điều hướng đến trang giỏ hàng nếu cần
+        </script>";
+    }
+}
+
+// Xử lý mua ngay
+if (isset($_POST['buy_now'])) {
+    $product_id = isset($_POST['product_id']) ? $_POST['product_id'] : null;
+
+    if ($product_id) {
+        // Kiểm tra xem người dùng đã đăng nhập chưa
+        if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+            // Nếu chưa đăng nhập, chuyển hướng đến checkout.php kèm theo product_id
+            header("Location: checkout.php?product_id=" . $product_id); // This is now correctly executed
+            exit(); // Important: Stop further execution
+        } else {
+            // Nếu đã đăng nhập, thêm sản phẩm vào giỏ hàng
+            if (isset($_SESSION['cart'][$product_id])) {
+                $_SESSION['cart'][$product_id] += 1;
+            } else {
+                $_SESSION['cart'][$product_id] = 1;
+            }
+            // Chuyển hướng đến trang cart.php hoặc thực hiện hành động khác
+            header("Location: cart.php");
+            exit();
+        }
+    } else {
+        echo "Lỗi: Không có product_id!";
+    }
+}
 
 // Query product based on p_id
 $stmt = $conn->prepare("SELECT * FROM tbl_product WHERE p_id = ?");
@@ -53,45 +108,8 @@ function formatPrice($price) {
         }
     </style>
 </head>
+<?php include_once("header.php") ?>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">    <!-- header -->
-    <header class="header fixed" style="background-color: #2C3E50;">
-        <div class="main-content">
-            <div class="body-header">
-                <!-- logo -->
-                <a href="index.php">
-                    <img src="asset/img/logo.jpg" alt="logo" class="logo" />
-                    <span class="company-name">Nội Thất Theanhdola</span>
-                </a>
-                <!-- navbar -->
-                <nav class="nav">
-                    <ul>
-                        <li><a href="index.php">Trang chủ</a></li>
-                        <li><a href="#">Liên hệ</a></li>
-                    </ul>
-                </nav>
-                <!-- btn action -->
-                <div class="action">
-                    <?php
-                    // Kiểm tra nếu người dùng đã đăng nhập
-                    if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-                        // Hiển thị tên người dùng và icon
-                        echo '<div class="user-info">';
-                        echo '<a href="cart.php"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<a href="#"><img src="asset/img/user-icon.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
-                        
-                        echo '<a href="logout.php" class="btn">Đăng xuất</a>'; // Nút đăng xuất
-                        echo '</div>';
-                    } else {
-                        // Hiển thị nút Đăng ký nếu chưa đăng nhập
-                        echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <div class="bg-white rounded-lg shadow-xl overflow-hidden max-w-6xl w-full zoom250">
         <div class="md:flex">
             <div class="md:flex-shrink-0">
@@ -120,13 +138,13 @@ function formatPrice($price) {
                 </div>
                 <div class="mt-8 space-y-4">
                     <?php if ($product['p_qty'] > 0): ?>
-                        <form method="POST" action="cart.php" class="mb-2">
+                        <form method="POST" action="" class="mb-2">
                             <input type="hidden" name="product_id" value="<?php echo $product['p_id']; ?>">
                             <button type="submit" name="add_to_cart" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-shopping-cart mr-2"></i> Thêm vào giỏ
                             </button>
                         </form>
-                        <form method="POST" action="checkout.php">
+                        <form method="POST" action="">
                             <input type="hidden" name="product_id" value="<?php echo $product['p_id']; ?>">
                             <button type="submit" name="buy_now" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded flex items-center justify-center">
                                 <i class="fas fa-credit-card mr-2"></i> Mua ngay

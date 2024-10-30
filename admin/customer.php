@@ -2,7 +2,7 @@
 
 <section class="content-header">
 	<div class="content-header-left">
-		<h1>View Customers</h1>
+		<h1>Xem khách</h1>
 	</div>
 </section>
 
@@ -14,13 +14,13 @@
 					<table id="example1" class="table table-bordered table-striped">
 						<thead>
 							<tr>
-								<th width="30">SL</th>
-								<th width="180">Name</th>
-								<th width="180">Email Address</th>
-								<th width="180">Country, City, State</th>
+								<th width="30">STT</th>
+								<th width="180">Tên</th>
+								<th width="180">Tài khoản email</th>
+								<th width="180">Địa chỉ</th>
 								<th>Status</th>
-								<th width="100">Change Status</th>
-								<th width="100">Action</th>
+								<th width="100">Trạng thái</th>
+								<th width="100">Hành động</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -47,10 +47,10 @@
 									</td>
 									<td><?php if($row['cust_status']==1) {echo 'Active';} else {echo 'Inactive';} ?></td>
 									<td>
-										<a href="customer-change-status.php?id=<?php echo $row['cust_id']; ?>" class="btn btn-success btn-xs">Change Status</a>
+										<a href="customer-change-status.php?id=<?php echo $row['cust_id']; ?>" class="btn btn-success btn-xs">Đổi trạng thái</a>
 									</td>
 									<td>
-										<a href="#" class="btn btn-danger btn-xs" data-href="customer-delete.php?id=<?php echo $row['cust_id']; ?>" data-toggle="modal" data-target="#confirm-delete">Delete</a>
+										<a href="#" class="btn btn-danger btn-xs" data-href="customer-delete.php?id=<?php echo $row['cust_id']; ?>" data-toggle="modal" data-target="#confirm-delete">Xoá</a>
 									</td>
 								</tr>
 								<?php
@@ -72,14 +72,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Delete Confirmation</h4>
+                <h4 class="modal-title" id="myModalLabel">Xác nhận xoá</h4>
             </div>
             <div class="modal-body">
-                <p>Are you sure want to delete this item?</p>
+                <p>Bạn muốn xoá?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger btn-ok">Delete</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Huỷ</button>
+                <a class="btn btn-danger btn-ok">Xoá</a>
             </div>
         </div>
     </div>

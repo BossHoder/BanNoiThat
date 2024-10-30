@@ -134,7 +134,7 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 <section class="content">
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-aqua"><i class="fa fa-hand-o-right"></i></span>
+			<span class="info-box-icon bg-green"><i class="fa fa-hand-o-right"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">Số sản phẩm</span>
 				<span class="info-box-number"><?php echo $total_product; ?></span>
@@ -164,17 +164,26 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-yellow"><i class="fa fa-hand-o-right"></i></span>
+			<span class="info-box-icon bg-green"><i class="fa fa-hand-o-right"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">Tổng lượng hàng đã bán</span>
 				<span class="info-box-number"><?php echo $total_sold; ?></span>
 			</div>
 		</div>
 	</div>
+	<div class="col-md-4 col-sm-6 col-xs-12">
+		<div class="info-box">
+			<span class="info-box-icon bg-green"><i class="fa fa-users"></i></span>
+			<div class="info-box-content">
+				<span class="info-box-text">Tổng số loại hàng</span>
+				<span class="info-box-number"><?php echo $total_end_categories ?> </span>
+			</div>
+		</div>
+	</div>
 
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-red"><i class="fa fa-hand-o-right"></i></span>
+			<span class="info-box-icon bg-blue"><i class="fa fa-hand-o-right"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">hàng bán chạy nhất</span>
 				<span class="info-box-number"><?php echo $top_product_name; ?> (<?php echo $total_most_product_quantity_sold; ?> đã bán)</span>
@@ -184,7 +193,7 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-red"><i class="fa fa-hand-o-right"></i></span>
+			<span class="info-box-icon bg-blue"><i class="fa fa-hand-o-right"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">hàng bán ế nhất</span>
 				<span class="info-box-number"><?php echo $less_product_name; ?> (<?php echo $total_less_product_quantity_sold; ?> đã bán)</span>
@@ -204,7 +213,7 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-yellow"><i class="fa fa-shopping-cart"></i></span>
+			<span class="info-box-icon bg-blue"><i class="fa fa-shopping-cart"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">Giá trị trung bình đơn hàng</span>
 				<span class="info-box-number"><?php echo number_format($avg_order_value, 0, ',', '.'); ?> đ</span>
@@ -214,7 +223,7 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-green"><i class="fa fa-retweet"></i></span>
+			<span class="info-box-icon bg-red"><i class="fa fa-retweet"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">Tỷ lệ khách hàng quay lại</span>
 				<span class="info-box-number"><?php echo number_format($customer_retention_rate, 2); ?>%</span>
@@ -223,22 +232,13 @@ $total_end_categories = $statement->fetch(PDO::FETCH_ASSOC)['total_end_categorie
 	</div>
 	<div class="col-md-4 col-sm-6 col-xs-12">
 		<div class="info-box">
-			<span class="info-box-icon bg-blue"><i class="fa fa-users"></i></span>
+			<span class="info-box-icon bg-red"><i class="fa fa-users"></i></span>
 			<div class="info-box-content">
 				<span class="info-box-text">Tổng số khách hàng</span>
 				<span class="info-box-number"><?php echo $total_customers ?> </span>
 			</div>
 		</div>
-		</div>
-	<div class="col-md-4 col-sm-6 col-xs-12">
-		<div class="info-box">
-			<span class="info-box-icon bg-blue"><i class="fa fa-users"></i></span>
-			<div class="info-box-content">
-				<span class="info-box-text">Tổng số loại hàng</span>
-				<span class="info-box-number"><?php echo $total_end_categories ?> </span>
-			</div>
-		</div>
-		</div>
+	</div>
 </section>
 
 <?php require_once('footer.php'); ?>

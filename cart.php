@@ -34,7 +34,27 @@ $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
             header("Location: inputKhach.php"); // Chuyển hướng đến trang nhập thông tin khách hàng nếu chưa đăng nhập
             exit;
         }
+    // Redirect to 'momo_payment.php' if the selected payment method is 'Thanh Toán Online'
+    if ($paymentMethod === 'bank-transfer') {
+        // Calculate the total price
+        $total_price = 0;
+        foreach ($cart_items as $item_id => $quantity) {
+            $query = "SELECT p_current_price FROM tbl_product WHERE p_id = '$item_id'";
+            $result = $conn->query($query);
+            if ($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                    $p_current_price = $row['p_current_price'];
+                    $total_price += $p_current_price * $quantity;
+                }
+            }
+        }
 
+        // Store the total price in the session
+        $_SESSION['total_price'] = $total_price;
+
+        header("Location: payment/momo_payment.php");
+        exit;
+    }
         $cust_id = $_SESSION['cust_id']; // Lấy ID khách hàng từ session
         $cust_name = $_SESSION['cust_name']; // Lấy tên khách hàng từ session
         $cust_email = $_SESSION['cust_email']; // Lấy email khách hàng từ session
@@ -99,7 +119,7 @@ $cart_items = isset($_SESSION['cart']) ? $_SESSION['cart'] : [];
 
             // Xử lý thông tin thanh toán
             $payment_method = $paymentMethod;
-            $payment_status = $payment_method === 'bank-transfer' ? 'pending' : 'completed'; // Tùy theo phương thức thanh toán
+            $payment_status = 'Pending'; // Tùy theo phương thức thanh toán
             $payment_date = date('Y-m-d H:i:s');
             $paid_amount = $tongtien; // Tổng số tiền đã thanh toán
             $txnid = uniqid(); // Mã giao dịch duy nhất
@@ -299,49 +319,7 @@ $result = $conn->query($sql);
 
 <body>
     <!-- header -->
-    <header class="header fixed" style="background-color: #2C3E50;">
-        <div class="main-content">
-            <div class="body-header">
-                <!-- logo -->
-                <a href="index.php">
-                    <img src="asset/img/logo.jpg" alt="logo" class="logo" />
-                    <span class="company-name">Nội Thất Theanhdola</span>
-                </a>
-                <!-- navbar -->
-                <nav class="nav">
-                    <ul>
-                        <li><a href="index.php">Trang chủ</a></li>
-                        <li><a href="#">Liên hệ</a></li>
-                    </ul>
-                </nav>
-                <!-- btn action -->
-                <div class="action">
-                    <?php
-                    // Kiểm tra nếu người dùng đã đăng nhập
-                    if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-                        // Hiển thị tên người dùng và icon
-                        echo '<div class="user-info">';
-                        echo '<a href="#"><img src="asset/img/shopping-cart-114.png" alt="User Icon" class="user-icon"></a>';
-                        echo '<a href="#" class="user-icon-wrapper">';
-                        echo '<img src="asset/img/user-icon.png" alt="User Icon" class="user-icon">';
-                        echo '</a>';
-                        echo '<span class="username">' . htmlspecialchars($_SESSION['cust_name']) . '</span>';
-                        echo '<div class="dropdown-menu">';
-                        echo '<a href="#">Username: ' . htmlspecialchars($_SESSION['cust_name']) . '</a>';
-                        echo '<a href="changepassword.php">Change Password</a>';
-                        echo '<a href="logout.php">Logout</a>';
-                        echo '</div>';
-                        echo '</div>';
-                    }
-                    else {
-                        // Hiển thị nút Đăng ký nếu chưa đăng nhập
-                        echo '<a href="signup.php" class="btn btn-sign-up btn-mgl">ĐĂNG KÝ</a>';
-                    }
-                    ?>
-                </div>
-            </div>
-        </div>
-    </header>
+     <?php include "header.php"; ?>
     <?php
     // Kiểm tra xem có sản phẩm nào trong giỏ hàng không
 

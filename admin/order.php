@@ -141,7 +141,7 @@ if ($success_message != '') {
                                 <th>Khách</th>
                                 <th>Hàng</th>
                                 <th>
-                                    Thanh toán
+                                    Phương thức thanh toán
                                 </th>
                                 <th>Tổng tiền</th>
                                 <th>trạng thái</th>
@@ -263,8 +263,7 @@ if ($success_message != '') {
                                         if ($row['payment_status'] == 'Pending') {
                                             ?>
                                             <a href="order-change-status.php?id=<?php echo $row['id']; ?>&task=Completed"
-                                                class="btn btn-warning btn-xs" style="width:100%;margin-bottom:4px;">Make
-                                                Completed</a>
+                                                class="btn btn-warning btn-xs" style="width:100%;margin-bottom:4px;">Chấp nhận đơn</a>
                                             <?php
                                         }
                                         ?>
@@ -277,8 +276,7 @@ if ($success_message != '') {
                                             if ($row['shipping_status'] == 'Pending') {
                                                 ?>
                                                 <a href="shipping-change-status.php?id=<?php echo $row['id']; ?>&task=Completed"
-                                                    class="btn btn-warning btn-xs" style="width:100%;margin-bottom:4px;">Make
-                                                    Completed</a>
+                                                    class="btn btn-warning btn-xs" style="width:100%;margin-bottom:4px;">Đã giao hàng</àng>
                                                 <?php
                                             }
                                         }
@@ -287,7 +285,7 @@ if ($success_message != '') {
                                     <td>
                                         <a href="#" class="btn btn-danger btn-xs"
                                             data-href="order-delete.php?id=<?php echo $row['id']; ?>" data-toggle="modal"
-                                            data-target="#confirm-delete" style="width:100%;">Delete</a>
+                                            data-target="#confirm-delete" style="width:100%;">Xoá</a>
                                     </td>
                                 </tr>
                                 <?php
@@ -308,14 +306,14 @@ if ($success_message != '') {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Delete Confirmation</h4>
+                <h4 class="modal-title" id="myModalLabel">Xác nhận xoá</h4>
             </div>
             <div class="modal-body">
-                Are you sure want to delete this item?
+                Muốn xoá?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger btn-ok">Delete</a>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Huỷ</button>
+                <a class="btn btn-danger btn-ok">Xoá</a>
             </div>
         </div>
     </div>

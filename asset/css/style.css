@@ -175,7 +175,7 @@ label a {
 }
 
 main {
-    padding-top: 200px;
+    padding-top: 12%;
     /* Điều chỉnh giá trị này tùy thuộc vào chiều cao của header */
     padding-left: 12%;
 }
@@ -256,7 +256,6 @@ main {
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
-    padding-top: 50px;
     /* 48px */
 }
 
